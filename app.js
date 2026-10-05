@@ -1,16 +1,6 @@
 let wall;
 
 
-const connectionDot =
-    document.getElementById(
-        "connectionDot"
-    );
-
-const connectionText =
-    document.getElementById(
-        "connectionText"
-    );
-
 const loading =
     document.getElementById(
         "loading"
@@ -21,16 +11,8 @@ async function start() {
 
     try {
 
-        /*
-         * Authenticate anonymously.
-         */
-
         await initializeAuth();
 
-
-        /*
-         * Create renderer.
-         */
 
         const canvas =
             document.getElementById(
@@ -55,10 +37,6 @@ async function start() {
         );
 
 
-        /*
-         * Load existing pixels.
-         */
-
         const pixels =
             await loadPixels();
 
@@ -72,10 +50,6 @@ async function start() {
             wall.pixels.size
         );
 
-
-        /*
-         * Realtime.
-         */
 
         subscribeToPixels(
             payload => {
@@ -125,27 +99,43 @@ async function start() {
 
 
         /*
-         * Pixel placement.
+         * Paint
          */
 
         wall.onPixelClick =
-            async (
-                x,
-                y
-            ) => {
+            async points => {
 
                 try {
 
-                    const pixel =
-                        await placePixel(
-                            x,
-                            y,
-                            wall.selectedColor
+                    const pixelsToPlace =
+                        points.map(
+                            point => ({
+                                x:
+                                    point.x,
+
+                                y:
+                                    point.y,
+
+                                color:
+                                    wall.selectedColor
+                            })
                         );
 
 
-                    wall.updatePixel(
-                        pixel
+                    const placed =
+                        await placePixels(
+                            pixelsToPlace
+                        );
+
+
+                    placed.forEach(
+                        pixel => {
+
+                            wall.updatePixel(
+                                pixel
+                            );
+
+                        }
                     );
 
 
@@ -154,11 +144,23 @@ async function start() {
                     );
 
 
-                    showPixel(
-                        x,
-                        y,
-                        wall.selectedColor
-                    );
+                    const center =
+                        points[
+                            Math.floor(
+                                points.length / 2
+                            )
+                        ];
+
+
+                    if (center) {
+
+                        showPixel(
+                            center.x,
+                            center.y,
+                            wall.selectedColor
+                        );
+
+                    }
 
                 }
 
@@ -169,7 +171,7 @@ async function start() {
                     );
 
                     alert(
-                        "Could not place pixel."
+                        "Could not place pixels."
                     );
 
                 }
@@ -178,27 +180,28 @@ async function start() {
 
 
         /*
-         * Pixel erasing.
+         * Eraser
          */
 
         wall.onPixelErase =
-            async (
-                x,
-                y
-            ) => {
+            async points => {
 
                 try {
 
-                    await erasePixel(
-                        x,
-                        y
+                    await erasePixels(
+                        points
                     );
 
 
-                    wall.deletePixel({
-                        x,
-                        y
-                    });
+                    points.forEach(
+                        point => {
+
+                            wall.deletePixel(
+                                point
+                            );
+
+                        }
+                    );
 
 
                     updatePixelCount(
@@ -217,7 +220,7 @@ async function start() {
                     );
 
                     alert(
-                        "Could not erase pixel. Check your Supabase DELETE policy."
+                        "Could not erase pixels. Check your Supabase DELETE policy."
                     );
 
                 }
@@ -226,7 +229,7 @@ async function start() {
 
 
         /*
-         * Controls.
+         * Zoom in
          */
 
         document
@@ -250,6 +253,10 @@ async function start() {
             );
 
 
+        /*
+         * Zoom out
+         */
+
         document
             .getElementById(
                 "zoomOut"
@@ -271,6 +278,10 @@ async function start() {
             );
 
 
+        /*
+         * Reset
+         */
+
         document
             .getElementById(
                 "resetView"
@@ -284,6 +295,10 @@ async function start() {
                 }
             );
 
+
+        /*
+         * Close selected pixel
+         */
 
         document
             .getElementById(
@@ -299,18 +314,6 @@ async function start() {
             );
 
 
-        /*
-         * Connected.
-         */
-
-        connectionDot.classList.add(
-            "connected"
-        );
-
-        connectionText.textContent =
-            "Live";
-
-
         loading.classList.add(
             "hidden"
         );
@@ -321,15 +324,6 @@ async function start() {
 
         console.error(
             error
-        );
-
-
-        connectionText.textContent =
-            "Offline";
-
-
-        connectionDot.classList.add(
-            "offline"
         );
 
 

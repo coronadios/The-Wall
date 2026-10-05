@@ -1,154 +1,51 @@
-(function () {
+(() => {
+    const splash = document.getElementById("splash");
+    const art = document.getElementById("splashArt");
 
-    const splash =
-        document.getElementById(
-            "splash"
-        );
+    if (!splash || !art) return;
 
+    let animationReady = false;
+    let appReady = false;
+    let finished = false;
 
-    const art =
-        document.getElementById(
-            "splashArt"
-        );
+    const total = 64;
 
-
-    /*
-     * 8 × 8 mini wall
-     */
-
-    const size =
-        8;
-
-
-    const total =
-        size * size;
-
-
-    /*
-     * Build pixels
-     */
-
-    for (
-        let i = 0;
-        i < total;
-        i++
-    ) {
-
-        const pixel =
-            document.createElement(
-                "div"
-            );
-
-
-        pixel.className =
-            "splash-pixel";
-
-
-        /*
-         * Tiny deterministic
-         * delay for each pixel.
-         */
-
-        pixel.style.animationDelay =
-            `${i * 0.028}s`;
-
-
-        art.appendChild(
-            pixel
-        );
-
+    for (let i = 0; i < total; i++) {
+        const pixel = document.createElement("div");
+        pixel.className = "splash-pixel";
+        pixel.style.animationDelay = `${i * 0.025}s`;
+        art.appendChild(pixel);
     }
 
+    const tryFinish = () => {
+        if (finished || !animationReady || !appReady) return;
 
-    /*
-     * Let the artwork
-     * finish drawing.
-     */
+        finished = true;
 
-    const artworkDuration =
-        total * 28 +
-        180;
+        splash.classList.add("done");
 
+        setTimeout(() => {
+            splash.remove();
+        }, 700);
+    };
 
-    setTimeout(
-        () => {
+    setTimeout(() => {
+        animationReady = true;
+        splash.classList.add("ready");
 
-            splash.classList.add(
-                "ready"
-            );
+        setTimeout(tryFinish, 500);
+    }, total * 25 + 900);
 
-        },
-        artworkDuration
-    );
+    window.finishWallSplash = () => {
+        appReady = true;
+        tryFinish();
+    };
 
-
-    /*
-     * App can tell us when
-     * Supabase + Wall are ready.
-     */
-
-    let appReady =
-        false;
-
-
-    let animationReady =
-        false;
-
-
-    window.finishWallSplash =
-        function () {
-
-            appReady =
-                true;
-
-
+    setTimeout(() => {
+        if (!finished) {
+            animationReady = true;
+            appReady = true;
             tryFinish();
-
-        };
-
-
-    setTimeout(
-        () => {
-
-            animationReady =
-                true;
-
-
-            tryFinish();
-
-        },
-        artworkDuration + 650
-    );
-
-
-    function tryFinish() {
-
-        /*
-         * Don't reveal the app until
-         * both the intro and app are ready.
-         */
-
-        if (
-            !appReady ||
-            !animationReady
-        ) {
-
-            return;
-
         }
-
-
-        setTimeout(
-            () => {
-
-                splash.classList.add(
-                    "done"
-                );
-
-            },
-            500
-        );
-
-    }
-
+    }, 5000);
 })();

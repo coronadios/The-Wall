@@ -1,37 +1,97 @@
 class Wall {
 
-    constructor(canvas, container) {
+    constructor(
+        canvas,
+        container
+    ) {
 
-        this.canvas = canvas;
-        this.container = container;
+        this.canvas =
+            canvas;
 
-        this.ctx = canvas.getContext("2d", {
-            alpha: false
-        });
+        this.container =
+            container;
 
-        this.size = 10000;
+        this.ctx =
+            canvas.getContext(
+                "2d",
+                {
+                    alpha: false
+                }
+            );
 
-        this.zoom = 1;
 
-        this.minZoom = 0.08;
-        this.maxZoom = 40;
+        this.size =
+            10000;
 
-        this.offsetX = 0;
-        this.offsetY = 0;
 
-        this.isDragging = false;
+        this.zoom =
+            1;
 
-        this.dragStartX = 0;
-        this.dragStartY = 0;
+        this.minZoom =
+            0.08;
 
-        this.startOffsetX = 0;
-        this.startOffsetY = 0;
+        this.maxZoom =
+            40;
 
-        this.pixels = new Map();
 
-        this.selectedColor = 0;
+        this.offsetX =
+            0;
+
+        this.offsetY =
+            0;
+
+
+        this.isDragging =
+            false;
+
+
+        this.dragStartX =
+            0;
+
+        this.dragStartY =
+            0;
+
+
+        this.startOffsetX =
+            0;
+
+        this.startOffsetY =
+            0;
+
+
+        /*
+         * Touch pointers
+         */
+
+        this.pointers =
+            new Map();
+
+
+        this.lastPinchDistance =
+            null;
+
+
+        this.pixels =
+            new Map();
+
+
+        /*
+         * Tool
+         *
+         * paint
+         * eraser
+         */
+
+        this.tool =
+            "paint";
+
+
+        this.selectedColor =
+            0;
+
 
         this.palette = [
+
             "#FFFFFF",
             "#000000",
             "#FF3B30",
@@ -44,16 +104,21 @@ class Wall {
             "#AF52DE",
             "#FF2D55",
             "#8E8E93"
+
         ];
 
+
         this.resize();
+
 
         window.addEventListener(
             "resize",
             () => this.resize()
         );
 
+
         this.setupInput();
+
 
         this.render();
 
@@ -62,15 +127,31 @@ class Wall {
 
     resize() {
 
-        const rect = this.container.getBoundingClientRect();
+        const rect =
+            this.container
+                .getBoundingClientRect();
 
-        const dpr = window.devicePixelRatio || 1;
 
-        this.canvas.width = rect.width * dpr;
-        this.canvas.height = rect.height * dpr;
+        const dpr =
+            window.devicePixelRatio ||
+            1;
 
-        this.canvas.style.width = `${rect.width}px`;
-        this.canvas.style.height = `${rect.height}px`;
+
+        this.canvas.width =
+            rect.width * dpr;
+
+
+        this.canvas.height =
+            rect.height * dpr;
+
+
+        this.canvas.style.width =
+            `${rect.width}px`;
+
+
+        this.canvas.style.height =
+            `${rect.height}px`;
+
 
         this.ctx.setTransform(
             dpr,
@@ -81,72 +162,95 @@ class Wall {
             0
         );
 
+
         this.render();
 
     }
 
 
-    setPixels(pixels) {
+    setPixels(
+        pixels
+    ) {
 
         this.pixels.clear();
 
-        for (const pixel of pixels) {
 
-            const key = `${pixel.x},${pixel.y}`;
+        for (
+            const pixel
+            of pixels
+        ) {
 
             this.pixels.set(
-                key,
+                `${pixel.x},${pixel.y}`,
                 pixel.color
             );
 
         }
 
+
         this.render();
 
     }
 
 
-    updatePixel(pixel) {
-
-        const key = `${pixel.x},${pixel.y}`;
+    updatePixel(
+        pixel
+    ) {
 
         this.pixels.set(
-            key,
+            `${pixel.x},${pixel.y}`,
             pixel.color
         );
 
-        this.render();
-
-    }
-
-
-    deletePixel(pixel) {
-
-        const key = `${pixel.x},${pixel.y}`;
-
-        this.pixels.delete(key);
 
         this.render();
 
     }
 
 
-    worldToScreen(x, y) {
+    deletePixel(
+        pixel
+    ) {
 
-        const rect = this.container.getBoundingClientRect();
+        this.pixels.delete(
+            `${pixel.x},${pixel.y}`
+        );
+
+
+        this.render();
+
+    }
+
+
+    worldToScreen(
+        x,
+        y
+    ) {
+
+        const rect =
+            this.container
+                .getBoundingClientRect();
+
 
         return {
 
             x:
                 rect.width / 2 +
-                (x - this.size / 2) *
-                    this.zoom +
+                (
+                    x -
+                    this.size / 2
+                ) *
+                this.zoom +
                 this.offsetX,
+
 
             y:
                 rect.height / 2 +
-                (y - this.size / 2) *
-                    this.zoom +
+                (
+                    y -
+                    this.size / 2
+                ) *
+                this.zoom +
                 this.offsetY
 
         };
@@ -154,34 +258,49 @@ class Wall {
     }
 
 
-    screenToWorld(screenX, screenY) {
+    screenToWorld(
+        screenX,
+        screenY
+    ) {
 
-        const rect = this.container.getBoundingClientRect();
+        const rect =
+            this.container
+                .getBoundingClientRect();
+
 
         return {
 
-            x: Math.floor(
-                (screenX -
-                    rect.width / 2 -
-                    this.offsetX) /
+            x:
+                Math.floor(
+                    (
+                        screenX -
+                        rect.width / 2 -
+                        this.offsetX
+                    ) /
                     this.zoom +
                     this.size / 2
-            ),
+                ),
 
-            y: Math.floor(
-                (screenY -
-                    rect.height / 2 -
-                    this.offsetY) /
+
+            y:
+                Math.floor(
+                    (
+                        screenY -
+                        rect.height / 2 -
+                        this.offsetY
+                    ) /
                     this.zoom +
                     this.size / 2
-            )
+                )
 
         };
 
     }
 
 
-    clampCoordinate(value) {
+    clampCoordinate(
+        value
+    ) {
 
         return Math.max(
             0,
@@ -194,15 +313,59 @@ class Wall {
     }
 
 
+    getWorldPoint(
+        event
+    ) {
+
+        const rect =
+            this.container
+                .getBoundingClientRect();
+
+
+        const world =
+            this.screenToWorld(
+                event.clientX -
+                    rect.left,
+
+                event.clientY -
+                    rect.top
+            );
+
+
+        return {
+
+            x:
+                this.clampCoordinate(
+                    world.x
+                ),
+
+            y:
+                this.clampCoordinate(
+                    world.y
+                )
+
+        };
+
+    }
+
+
     render() {
 
         const rect =
-            this.container.getBoundingClientRect();
+            this.container
+                .getBoundingClientRect();
 
-        const width = rect.width;
-        const height = rect.height;
 
-        this.ctx.fillStyle = "#080808";
+        const width =
+            rect.width;
+
+        const height =
+            rect.height;
+
+
+        this.ctx.fillStyle =
+            "#080808";
+
 
         this.ctx.fillRect(
             0,
@@ -213,11 +376,15 @@ class Wall {
 
 
         /*
-         * World border
+         * Wall border
          */
 
         const topLeft =
-            this.worldToScreen(0, 0);
+            this.worldToScreen(
+                0,
+                0
+            );
+
 
         const bottomRight =
             this.worldToScreen(
@@ -229,13 +396,18 @@ class Wall {
         this.ctx.strokeStyle =
             "rgba(255,255,255,0.12)";
 
-        this.ctx.lineWidth = 1;
+
+        this.ctx.lineWidth =
+            1;
+
 
         this.ctx.strokeRect(
             topLeft.x,
             topLeft.y,
-            bottomRight.x - topLeft.x,
-            bottomRight.y - topLeft.y
+            bottomRight.x -
+                topLeft.x,
+            bottomRight.y -
+                topLeft.y
         );
 
 
@@ -243,56 +415,72 @@ class Wall {
          * Grid
          */
 
-        if (this.zoom >= 4) {
+        if (
+            this.zoom >= 4
+        ) {
 
             const gridSize =
                 this.zoom;
+
 
             const startX =
                 Math.max(
                     0,
                     Math.floor(
-                        (0 -
-                            topLeft.x) /
-                            gridSize
+                        (
+                            0 -
+                            topLeft.x
+                        ) /
+                        gridSize
                     )
                 );
+
 
             const endX =
                 Math.min(
                     this.size,
                     Math.ceil(
-                        (width -
-                            topLeft.x) /
-                            gridSize
+                        (
+                            width -
+                            topLeft.x
+                        ) /
+                        gridSize
                     )
                 );
+
 
             const startY =
                 Math.max(
                     0,
                     Math.floor(
-                        (0 -
-                            topLeft.y) /
-                            gridSize
+                        (
+                            0 -
+                            topLeft.y
+                        ) /
+                        gridSize
                     )
                 );
+
 
             const endY =
                 Math.min(
                     this.size,
                     Math.ceil(
-                        (height -
-                            topLeft.y) /
-                            gridSize
+                        (
+                            height -
+                            topLeft.y
+                        ) /
+                        gridSize
                     )
                 );
 
 
             this.ctx.beginPath();
 
+
             this.ctx.strokeStyle =
                 "rgba(255,255,255,0.035)";
+
 
             for (
                 let x = startX;
@@ -302,12 +490,15 @@ class Wall {
 
                 const sx =
                     topLeft.x +
-                    x * gridSize;
+                    x *
+                    gridSize;
+
 
                 this.ctx.moveTo(
                     sx,
                     0
                 );
+
 
                 this.ctx.lineTo(
                     sx,
@@ -325,12 +516,15 @@ class Wall {
 
                 const sy =
                     topLeft.y +
-                    y * gridSize;
+                    y *
+                    gridSize;
+
 
                 this.ctx.moveTo(
                     0,
                     sy
                 );
+
 
                 this.ctx.lineTo(
                     width,
@@ -339,30 +533,38 @@ class Wall {
 
             }
 
+
             this.ctx.stroke();
 
         }
 
 
         /*
-         * Visible pixels only
+         * Pixels
          */
 
-        for (const [
-            key,
-            colorIndex
-        ] of this.pixels) {
+        for (
+            const [
+                key,
+                colorIndex
+            ]
+            of this.pixels
+        ) {
 
             const [
                 x,
                 y
-            ] = key
-                .split(",")
-                .map(Number);
+            ] =
+                key
+                    .split(",")
+                    .map(Number);
 
 
             const screen =
-                this.worldToScreen(x, y);
+                this.worldToScreen(
+                    x,
+                    y
+                );
 
 
             const pixelSize =
@@ -373,17 +575,30 @@ class Wall {
 
 
             if (
-                screen.x + pixelSize < 0 ||
-                screen.y + pixelSize < 0 ||
-                screen.x > width ||
-                screen.y > height
+                screen.x +
+                    pixelSize <
+                    0 ||
+
+                screen.y +
+                    pixelSize <
+                    0 ||
+
+                screen.x >
+                    width ||
+
+                screen.y >
+                    height
             ) {
+
                 continue;
+
             }
 
 
             this.ctx.fillStyle =
-                this.palette[colorIndex] ||
+                this.palette[
+                    colorIndex
+                ] ||
                 "#FFFFFF";
 
 
@@ -412,14 +627,12 @@ class Wall {
             );
 
 
-        this.zoom *= factor;
-
         this.zoom =
             Math.max(
                 this.minZoom,
                 Math.min(
                     this.maxZoom,
-                    this.zoom
+                    this.zoom * factor
                 )
             );
 
@@ -432,15 +645,23 @@ class Wall {
 
 
         this.offsetX +=
-            (after.x - before.x) *
+            (
+                after.x -
+                before.x
+            ) *
             this.zoom;
 
+
         this.offsetY +=
-            (after.y - before.y) *
+            (
+                after.y -
+                before.y
+            ) *
             this.zoom;
 
 
         this.render();
+
 
         updateZoomUI(
             this.zoom
@@ -451,6 +672,25 @@ class Wall {
 
     setupInput() {
 
+        /*
+         * Prevent browser
+         * context menu.
+         */
+
+        this.canvas.addEventListener(
+            "contextmenu",
+            event => {
+
+                event.preventDefault();
+
+            }
+        );
+
+
+        /*
+         * Pointer down
+         */
+
         this.canvas.addEventListener(
             "pointerdown",
             event => {
@@ -459,16 +699,68 @@ class Wall {
                     event.pointerId
                 );
 
-                this.isDragging = true;
+
+                this.pointers.set(
+                    event.pointerId,
+                    {
+                        x:
+                            event.clientX,
+
+                        y:
+                            event.clientY
+                    }
+                );
+
+
+                /*
+                 * Two fingers:
+                 * pinch mode
+                 */
+
+                if (
+                    this.pointers.size >= 2
+                ) {
+
+                    const points =
+                        [
+                            ...this.pointers.values()
+                        ];
+
+
+                    this.lastPinchDistance =
+                        Math.hypot(
+                            points[0].x -
+                                points[1].x,
+
+                            points[0].y -
+                                points[1].y
+                        );
+
+
+                    this.isDragging =
+                        false;
+
+
+                    return;
+
+                }
+
+
+                this.isDragging =
+                    true;
+
 
                 this.dragStartX =
                     event.clientX;
 
+
                 this.dragStartY =
                     event.clientY;
 
+
                 this.startOffsetX =
                     this.offsetX;
+
 
                 this.startOffsetY =
                     this.offsetY;
@@ -477,16 +769,43 @@ class Wall {
         );
 
 
+        /*
+         * Pointer move
+         */
+
         this.canvas.addEventListener(
             "pointermove",
             event => {
 
+                if (
+                    this.pointers.has(
+                        event.pointerId
+                    )
+                ) {
+
+                    this.pointers.set(
+                        event.pointerId,
+                        {
+                            x:
+                                event.clientX,
+
+                            y:
+                                event.clientY
+                        }
+                    );
+
+                }
+
+
                 const rect =
-                    this.container.getBoundingClientRect();
+                    this.container
+                        .getBoundingClientRect();
+
 
                 const x =
                     event.clientX -
                     rect.left;
+
 
                 const y =
                     event.clientY -
@@ -501,8 +820,81 @@ class Wall {
                 );
 
 
-                if (!this.isDragging) {
+                /*
+                 * Pinch zoom
+                 */
+
+                if (
+                    this.pointers.size >= 2
+                ) {
+
+                    const points =
+                        [
+                            ...this.pointers.values()
+                        ];
+
+
+                    const distance =
+                        Math.hypot(
+                            points[0].x -
+                                points[1].x,
+
+                            points[0].y -
+                                points[1].y
+                        );
+
+
+                    if (
+                        this.lastPinchDistance
+                    ) {
+
+                        const factor =
+                            distance /
+                            this.lastPinchDistance;
+
+
+                        const centerX =
+                            (
+                                points[0].x +
+                                points[1].x
+                            ) /
+                            2;
+
+
+                        const centerY =
+                            (
+                                points[0].y +
+                                points[1].y
+                            ) /
+                            2;
+
+
+                        this.zoomAt(
+                            factor,
+                            centerX -
+                                rect.left,
+                            centerY -
+                                rect.top
+                        );
+
+                    }
+
+
+                    this.lastPinchDistance =
+                        distance;
+
+
                     return;
+
+                }
+
+
+                if (
+                    !this.isDragging
+                ) {
+
+                    return;
+
                 }
 
 
@@ -528,12 +920,44 @@ class Wall {
         );
 
 
-        this.canvas.addEventListener(
-            "pointerup",
+        /*
+         * Pointer up
+         */
+
+        const finishPointer =
             event => {
 
-                if (!this.isDragging) {
+                this.pointers.delete(
+                    event.pointerId
+                );
+
+
+                if (
+                    this.pointers.size <
+                    2
+                ) {
+
+                    this.lastPinchDistance =
+                        null;
+
+                }
+
+
+                if (
+                    this.pointers.size > 0
+                ) {
+
                     return;
+
+                }
+
+
+                if (
+                    !this.isDragging
+                ) {
+
+                    return;
+
                 }
 
 
@@ -547,58 +971,91 @@ class Wall {
                     );
 
 
-                this.isDragging = false;
+                this.isDragging =
+                    false;
 
 
                 /*
-                 * Small movement = pixel click
+                 * Was a drag.
                  */
 
-                if (distance < 5) {
+                if (
+                    distance >= 5
+                ) {
 
-                    const rect =
-                        this.container.getBoundingClientRect();
-
-                    const world =
-                        this.screenToWorld(
-                            event.clientX -
-                                rect.left,
-
-                            event.clientY -
-                                rect.top
-                        );
-
-
-                    const x =
-                        this.clampCoordinate(
-                            world.x
-                        );
-
-                    const y =
-                        this.clampCoordinate(
-                            world.y
-                        );
-
-
-                    if (
-                        x >= 0 &&
-                        x < this.size &&
-                        y >= 0 &&
-                        y < this.size
-                    ) {
-
-                        this.onPixelClick?.(
-                            x,
-                            y
-                        );
-
-                    }
+                    return;
 
                 }
 
-            }
+
+                const point =
+                    this.getWorldPoint(
+                        event
+                    );
+
+
+                /*
+                 * Right click:
+                 * erase
+                 */
+
+                if (
+                    event.button === 2
+                ) {
+
+                    this.onPixelErase?.(
+                        point.x,
+                        point.y
+                    );
+
+
+                    return;
+
+                }
+
+
+                /*
+                 * Left click:
+                 * current tool
+                 */
+
+                if (
+                    this.tool ===
+                    "eraser"
+                ) {
+
+                    this.onPixelErase?.(
+                        point.x,
+                        point.y
+                    );
+
+                } else {
+
+                    this.onPixelClick?.(
+                        point.x,
+                        point.y
+                    );
+
+                }
+
+            };
+
+
+        this.canvas.addEventListener(
+            "pointerup",
+            finishPointer
         );
 
+
+        this.canvas.addEventListener(
+            "pointercancel",
+            finishPointer
+        );
+
+
+        /*
+         * Desktop wheel zoom
+         */
 
         this.canvas.addEventListener(
             "wheel",
@@ -606,16 +1063,10 @@ class Wall {
 
                 event.preventDefault();
 
+
                 const rect =
-                    this.container.getBoundingClientRect();
-
-                const x =
-                    event.clientX -
-                    rect.left;
-
-                const y =
-                    event.clientY -
-                    rect.top;
+                    this.container
+                        .getBoundingClientRect();
 
 
                 const factor =
@@ -626,13 +1077,18 @@ class Wall {
 
                 this.zoomAt(
                     factor,
-                    x,
-                    y
+
+                    event.clientX -
+                        rect.left,
+
+                    event.clientY -
+                        rect.top
                 );
 
             },
             {
-                passive: false
+                passive:
+                    false
             }
         );
 
@@ -641,13 +1097,20 @@ class Wall {
 
     resetView() {
 
-        this.zoom = 1;
+        this.zoom =
+            1;
 
-        this.offsetX = 0;
 
-        this.offsetY = 0;
+        this.offsetX =
+            0;
+
+
+        this.offsetY =
+            0;
+
 
         this.render();
+
 
         updateZoomUI(
             this.zoom

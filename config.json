@@ -1,7 +1,4 @@
 window.THE_WALL_CONFIG = {
-
-    SUPABASE_URL: "YOUR_SUPABASE_URL",
-
-    SUPABASE_ANON_KEY: "YOUR_SUPABASE_ANON_KEY"
-
+    SUPABASE_URL: "https://zxlqxquqxavurygtpsnk.supabase.co",
+    SUPABASE_ANON_KEY: "sb_publishable_fyrUC30vYOO00s7jcBii4Q_TtPmErxF"
 };

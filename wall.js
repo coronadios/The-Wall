@@ -1,3 +1,55 @@
+const {
+    WORLD_WIDTH,
+    WORLD_HEIGHT,
+    MIN_ZOOM,
+    MAX_ZOOM,
+    clampWorldCoordinate,
+    buildBrushPoints,
+    buildLinePoints
+} = window.TheWallCore || {
+    WORLD_WIDTH: 10000,
+    WORLD_HEIGHT: 10000,
+    MIN_ZOOM: 0.03,
+    MAX_ZOOM: 40,
+    clampWorldCoordinate: (value, width = 10000) => Math.max(0, Math.min((width || 10000) - 1, value)),
+    buildBrushPoints: (centerX, centerY, brushSize = 1, worldWidth = 10000, worldHeight = 10000) => {
+        const size = Math.max(1, Math.floor(Number(brushSize) || 1));
+        const radius = Math.floor((size - 1) / 2);
+        const end = size - 1 - radius;
+        const points = [];
+        for (let dy = -radius; dy <= end; dy += 1) {
+            for (let dx = -radius; dx <= end; dx += 1) {
+                points.push({
+                    x: Math.max(0, Math.min((worldWidth || 10000) - 1, centerX + dx)),
+                    y: Math.max(0, Math.min((worldHeight || 10000) - 1, centerY + dy))
+                });
+            }
+        }
+        return points;
+    },
+    buildLinePoints: (start, end) => {
+        if (!start || !end) return [];
+        const points = [];
+        let x0 = Math.round(start.x);
+        let y0 = Math.round(start.y);
+        const x1 = Math.round(end.x);
+        const y1 = Math.round(end.y);
+        const dx = Math.abs(x1 - x0);
+        const dy = Math.abs(y1 - y0);
+        const sx = x0 < x1 ? 1 : -1;
+        const sy = y0 < y1 ? 1 : -1;
+        let err = dx - dy;
+        while (true) {
+            points.push({ x: x0, y: y0 });
+            if (x0 === x1 && y0 === y1) break;
+            const e2 = err * 2;
+            if (e2 > -dy) { err -= dy; x0 += sx; }
+            if (e2 < dx) { err += dx; y0 += sy; }
+        }
+        return points;
+    }
+};
+
 class Wall {
 
     constructor(
@@ -21,17 +73,22 @@ class Wall {
 
 
         this.size =
-            10000;
+            WORLD_WIDTH;
 
+        this.worldWidth =
+            WORLD_WIDTH;
+
+        this.worldHeight =
+            WORLD_HEIGHT;
 
         this.zoom =
             1;
 
         this.minZoom =
-            0.08;
+            MIN_ZOOM;
 
         this.maxZoom =
-            40;
+            MAX_ZOOM;
 
 
         this.offsetX =
@@ -43,6 +100,15 @@ class Wall {
 
         this.isDragging =
             false;
+
+        this.dragMode =
+            "pan";
+
+        this.spacePanActive =
+            false;
+
+        this.lastPaintPoint =
+            null;
 
         this.dragStartX =
             0;
@@ -266,6 +332,7 @@ class Wall {
                 (
                     x -
                     this.size / 2
+                    this.worldWidth / 2
                 ) *
                 this.zoom +
                 this.offsetX,
@@ -276,6 +343,7 @@ class Wall {
                 (
                     y -
                     this.size / 2
+                    this.worldHeight / 2
                 ) *
                 this.zoom +
                 this.offsetY
@@ -306,6 +374,7 @@ class Wall {
                     ) /
                     this.zoom +
                     this.size / 2
+                    this.worldWidth / 2
                 ),
 
 
@@ -318,6 +387,7 @@ class Wall {
                     ) /
                     this.zoom +
                     this.size / 2
+                    this.worldHeight / 2
                 )
 
         };
@@ -335,6 +405,14 @@ class Wall {
                 this.size - 1,
                 value
             )
+        value,
+        maxValue = this.worldWidth - 1
+    ) {
+
+        return clampWorldCoordinate(
+            value,
+            this.worldWidth,
+            this.worldHeight
         );
 
     }
@@ -438,6 +516,46 @@ class Wall {
                     x,
                     y
                 });
+        return buildBrushPoints(
+            center.x,
+            center.y,
+            this.brushSize,
+            this.worldWidth,
+            this.worldHeight
+        );
+
+    }
+
+    interpolateBrushPoints(
+        start,
+        end
+    ) {
+
+        const linePoints =
+            buildLinePoints(
+                start,
+                end
+            );
+
+        const points =
+            new Map();
+
+        for (
+            const point
+            of linePoints
+        ) {
+
+            for (
+                const brushPoint
+                of this.getBrushPoints(
+                    point
+                )
+            ) {
+
+                points.set(
+                    `${brushPoint.x},${brushPoint.y}`,
+                    brushPoint
+                );
 
             }
 
@@ -445,6 +563,67 @@ class Wall {
 
 
         return points;
+        return [
+            ...points.values()
+        ];
+
+    }
+
+    paintBrushPoints(
+        points,
+        erase
+    ) {
+
+        if (
+            !points?.length
+        ) {
+
+            return;
+
+        }
+
+        const unique =
+            new Map();
+
+        points.forEach(
+            point => {
+
+                unique.set(
+                    `${point.x},${point.y}`,
+                    point
+                );
+
+            }
+        );
+
+        const finalPoints =
+            [
+                ...unique.values()
+            ];
+
+        if (
+            !finalPoints.length
+        ) {
+
+            return;
+
+        }
+
+        if (
+            erase
+        ) {
+
+            this.onPixelErase?.(
+                finalPoints
+            );
+
+            return;
+
+        }
+
+        this.onPixelClick?.(
+            finalPoints
+        );
 
     }
 
@@ -938,6 +1117,10 @@ class Wall {
         screenY
     ) {
 
+        const rect =
+            this.container
+                .getBoundingClientRect();
+
         const before =
             this.screenToWorld(
                 screenX,
@@ -946,6 +1129,7 @@ class Wall {
 
 
         this.zoom =
+        const nextZoom =
             Math.max(
                 this.minZoom,
                 Math.min(
@@ -978,6 +1162,27 @@ class Wall {
             ) *
             this.zoom;
 
+
+        this.zoom =
+            nextZoom;
+
+        this.offsetX =
+            screenX -
+            rect.width / 2 -
+            (
+                before.x -
+                this.worldWidth / 2
+            ) *
+            this.zoom;
+
+        this.offsetY =
+            screenY -
+            rect.height / 2 -
+            (
+                before.y -
+                this.worldHeight / 2
+            ) *
+            this.zoom;
 
         this.render();
 
@@ -1053,15 +1258,35 @@ class Wall {
                                 points[1].y
                         );
 
+                    this.dragMode =
+                        "pan";
 
                     this.isDragging =
                         false;
 
+                    this.lastPaintPoint =
+                        null;
 
                     return;
 
                 }
 
+                const isPanGesture =
+                    event.button === 1 ||
+                    (
+                        event.button === 0 &&
+                        this.spacePanActive
+                    );
+
+                this.dragMode =
+                    isPanGesture
+                        ? "pan"
+                        : (
+                            event.button === 2 ||
+                            this.tool === "eraser"
+                        )
+                            ? "erase"
+                            : "paint";
 
                 this.isDragging =
                     true;
@@ -1083,11 +1308,51 @@ class Wall {
                     this.offsetY;
 
 
+                this.dragStartX =
+                    event.clientX;
+
+                this.dragStartY =
+                    event.clientY;
+
+                this.startOffsetX =
+                    this.offsetX;
+
+                this.startOffsetY =
+                    this.offsetY;
+
                 this.cursor =
                     this.getWorldPoint(
                         event
                     );
 
+                if (
+                    this.dragMode === "paint" ||
+                    this.dragMode === "erase"
+                ) {
+
+                    const point =
+                        this.getWorldPoint(
+                            event
+                        );
+
+                    this.lastPaintPoint =
+                        point;
+
+                    const points =
+                        this.dragMode === "erase"
+                            ? this.getBrushPoints(
+                                point
+                            )
+                            : this.getBrushPoints(
+                                point
+                            );
+
+                    this.paintBrushPoints(
+                        points,
+                        this.dragMode === "erase"
+                    );
+
+                }
 
                 this.render();
 
@@ -1239,6 +1504,49 @@ class Wall {
 
 
                 if (
+                    this.dragMode === "paint" ||
+                    this.dragMode === "erase"
+                ) {
+
+                    const point =
+                        this.getWorldPoint(
+                            event
+                        );
+
+                    if (
+                        !this.lastPaintPoint ||
+                        point.x !== this.lastPaintPoint.x ||
+                        point.y !== this.lastPaintPoint.y
+                    ) {
+
+                        const strokePoints =
+                            this.lastPaintPoint
+                                ? this.interpolateBrushPoints(
+                                    this.lastPaintPoint,
+                                    point
+                                )
+                                : this.getBrushPoints(
+                                    point
+                                );
+
+                        this.paintBrushPoints(
+                            strokePoints,
+                            this.dragMode === "erase"
+                        );
+
+                        this.lastPaintPoint =
+                            point;
+
+                    }
+
+                    this.render();
+
+                    return;
+
+                }
+
+
+                if (
                     !this.isDragging
                 ) {
 
@@ -1298,6 +1606,25 @@ class Wall {
                     this.pointers.size >
                     0
                 ) {
+
+                    return;
+
+                }
+
+
+                if (
+                    this.dragMode === "paint" ||
+                    this.dragMode === "erase"
+                ) {
+
+                    this.lastPaintPoint =
+                        null;
+
+                    this.isDragging =
+                        false;
+
+                    this.dragMode =
+                        "pan";
 
                     return;
 
@@ -1446,6 +1773,73 @@ class Wall {
             {
                 passive:
                     false
+            }
+        );
+
+        window.addEventListener(
+            "keydown",
+            event => {
+
+                if (
+                    event.code === "Space" &&
+                    ![
+                        "INPUT",
+                        "TEXTAREA"
+                    ].includes(
+                        document.activeElement?.tagName || ""
+                    )
+                ) {
+
+                    event.preventDefault();
+                    this.spacePanActive = true;
+
+                }
+
+                if (
+                    event.key === "+" ||
+                    event.key === "="
+                ) {
+
+                    event.preventDefault();
+                    const rect = this.container.getBoundingClientRect();
+                    this.zoomAt(1.15, rect.width / 2, rect.height / 2);
+
+                }
+
+                if (
+                    event.key === "-"
+                ) {
+
+                    event.preventDefault();
+                    const rect = this.container.getBoundingClientRect();
+                    this.zoomAt(1 / 1.15, rect.width / 2, rect.height / 2);
+
+                }
+
+                if (
+                    event.key === "0"
+                ) {
+
+                    event.preventDefault();
+                    this.resetView();
+
+                }
+
+            }
+        );
+
+        window.addEventListener(
+            "keyup",
+            event => {
+
+                if (
+                    event.code === "Space"
+                ) {
+
+                    this.spacePanActive = false;
+
+                }
+
             }
         );
 

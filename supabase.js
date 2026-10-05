@@ -1,4 +1,221 @@
 /*
+ * The Wall
+ * Supabase client + authentication + realtime
+ */
+
+const SUPABASE_URL =
+    window.THE_WALL_CONFIG?.SUPABASE_URL;
+
+const SUPABASE_ANON_KEY =
+    window.THE_WALL_CONFIG?.SUPABASE_ANON_KEY;
+
+
+if (
+    !SUPABASE_URL ||
+    !SUPABASE_ANON_KEY
+) {
+
+    throw new Error(
+        "The Wall Supabase configuration is missing."
+    );
+
+}
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+
+let currentUser = null;
+
+
+/*
+ * Anonymous authentication
+ */
+
+async function initializeAuth() {
+
+    const {
+        data: sessionData
+    } =
+        await supabaseClient
+            .auth
+            .getSession();
+
+
+    if (
+        sessionData?.session?.user
+    ) {
+
+        currentUser =
+            sessionData.session.user;
+
+        return currentUser;
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .auth
+            .signInAnonymously();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Anonymous authentication failed:",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    currentUser =
+        data.user;
+
+
+    return currentUser;
+
+}
+
+
+/*
+ * Load all existing pixels
+ */
+
+async function loadPixels() {
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("pixels")
+            .select(
+                "x,y,color,user_id,created_at"
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Pixel loading failed:",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    return data || [];
+
+}
+
+
+/*
+ * Realtime pixel updates
+ */
+
+function subscribeToPixels(
+    callback
+) {
+
+    return supabaseClient
+        .channel(
+            "the-wall-pixels"
+        )
+        .on(
+            "postgres_changes",
+            {
+                event: "*",
+                schema: "public",
+                table: "pixels"
+            },
+            callback
+        )
+        .subscribe();
+
+}
+
+
+/*
+ * Paint one pixel
+ */
+
+async function placePixel(
+    x,
+    y,
+    color
+) {
+
+    if (
+        !currentUser
+    ) {
+
+        throw new Error(
+            "User is not authenticated."
+        );
+
+    }
+
+
+    const {
+        data,
+        error
+    } =
+        await supabaseClient
+            .from("pixels")
+            .upsert(
+                {
+                    x,
+                    y,
+                    color,
+                    user_id:
+                        currentUser.id
+                },
+                {
+                    onConflict:
+                        "x,y"
+                }
+            )
+            .select()
+            .single();
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Pixel placement failed:",
+            error
+        );
+
+        throw error;
+
+    }
+
+
+    return data;
+
+}
+
+
+/*
  * Paint multiple pixels
  */
 
@@ -18,7 +235,7 @@ async function placePixels(
 
 
     if (
-        !pixels.length
+        !pixels?.length
     ) {
 
         return [];
@@ -26,16 +243,24 @@ async function placePixels(
     }
 
 
-    /*
-     * Remove duplicates.
-     */
-
     const unique =
         new Map();
 
 
     pixels.forEach(
         pixel => {
+
+            if (
+                pixel.x < 0 ||
+                pixel.x >= 10000 ||
+                pixel.y < 0 ||
+                pixel.y >= 10000
+            ) {
+
+                return;
+
+            }
+
 
             unique.set(
                 `${pixel.x},${pixel.y}`,
@@ -46,6 +271,37 @@ async function placePixels(
     );
 
 
+    const rows =
+        [
+            ...unique.values()
+        ].map(
+            pixel => ({
+
+                x:
+                    pixel.x,
+
+                y:
+                    pixel.y,
+
+                color:
+                    pixel.color,
+
+                user_id:
+                    currentUser.id
+
+            })
+        );
+
+
+    if (
+        !rows.length
+    ) {
+
+        return [];
+
+    }
+
+
     const {
         data,
         error
@@ -53,25 +309,7 @@ async function placePixels(
         await supabaseClient
             .from("pixels")
             .upsert(
-                [
-                    ...unique.values()
-                ].map(
-                    pixel => ({
-
-                        x:
-                            pixel.x,
-
-                        y:
-                            pixel.y,
-
-                        color:
-                            pixel.color,
-
-                        user_id:
-                            currentUser.id
-
-                    })
-                ),
+                rows,
                 {
                     onConflict:
                         "x,y"
@@ -100,6 +338,58 @@ async function placePixels(
 
 
 /*
+ * Erase one pixel
+ */
+
+async function erasePixel(
+    x,
+    y
+) {
+
+    if (
+        !currentUser
+    ) {
+
+        throw new Error(
+            "User is not authenticated."
+        );
+
+    }
+
+
+    const {
+        error
+    } =
+        await supabaseClient
+            .from("pixels")
+            .delete()
+            .eq(
+                "x",
+                x
+            )
+            .eq(
+                "y",
+                y
+            );
+
+
+    if (
+        error
+    ) {
+
+        console.error(
+            "Pixel deletion failed:",
+            error
+        );
+
+        throw error;
+
+    }
+
+}
+
+
+/*
  * Erase multiple pixels
  */
 
@@ -119,22 +409,13 @@ async function erasePixels(
 
 
     if (
-        !pixels.length
+        !pixels?.length
     ) {
 
         return;
 
     }
 
-
-    /*
-     * Supabase .in(x).in(y)
-     * would erase a rectangle instead
-     * of the exact brush shape.
-     *
-     * Since our brush is rectangular,
-     * calculate the exact unique coordinates.
-     */
 
     const unique =
         new Map();
@@ -143,14 +424,35 @@ async function erasePixels(
     pixels.forEach(
         pixel => {
 
+            if (
+                pixel.x < 0 ||
+                pixel.x >= 10000 ||
+                pixel.y < 0 ||
+                pixel.y >= 10000
+            ) {
+
+                return;
+
+            }
+
+
             unique.set(
                 `${pixel.x},${pixel.y}`,
                 pixel
+
             );
 
         }
     );
 
+
+    /*
+     * Delete exact coordinates.
+     *
+     * We intentionally do individual deletes
+     * because x IN (...) AND y IN (...)
+     * would affect every combination.
+     */
 
     for (
         const pixel
@@ -160,17 +462,17 @@ async function erasePixels(
         const {
             error
         } =
-            await supabaseClient
-                .from("pixels")
-                .delete()
-                .eq(
-                    "x",
-                    pixel.x
-                )
-                .eq(
-                    "y",
-                    pixel.y
-                );
+        await supabaseClient
+            .from("pixels")
+            .delete()
+            .eq(
+                "x",
+                pixel.x
+            )
+            .eq(
+                "y",
+                pixel.y
+            );
 
 
         if (

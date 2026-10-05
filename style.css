@@ -1367,6 +1367,43 @@ footer {
 
     }
 
+    /* Brush size control */
+
+.brush-control {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 76px;
+    padding: 0 9px;
+    cursor: pointer;
+}
+
+.brush-control .brush-minus,
+.brush-control .brush-plus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 17px;
+    line-height: 1;
+    opacity: .65;
+    transition: opacity .15s ease;
+}
+
+.brush-control .brush-minus:hover,
+.brush-control .brush-plus:hover {
+    opacity: 1;
+}
+
+.brush-control .brush-size {
+    min-width: 29px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: -.2px;
+}
 
     footer {
 

@@ -2,10 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    >
 
     <title>The Wall</title>
-    <meta name="description" content="A collaborative canvas built by everyone.">
+    <meta
+        name="description"
+        content="A collaborative canvas built by everyone."
+    >
 
     <link rel="icon" href="assets/favicon.svg">
     <link rel="stylesheet" href="style.css">
@@ -15,43 +21,98 @@
 
 <body>
 
+    <!-- SPLASH SCREEN -->
+
+    <div id="splash" aria-hidden="true">
+
+        <div
+            class="splash-art"
+            id="splashArt"
+        ></div>
+
+        <div class="splash-title">
+
+            <strong>The Wall</strong>
+
+            <span>By: Corona</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- APP -->
+
     <div id="app">
 
         <header class="topbar">
+
             <div class="brand">
+
                 <div class="brand-mark"></div>
 
                 <div>
+
                     <h1>The Wall</h1>
-                    <span>built by everyone</span>
+
+                    <span>
+                        built by everyone
+                    </span>
+
                 </div>
+
             </div>
 
+
             <div class="status">
-                <span id="connectionDot"></span>
-                <span id="connectionText">Connecting...</span>
+
+                <span
+                    id="connectionDot"
+                ></span>
+
+                <span
+                    id="connectionText"
+                >
+                    Connecting...
+                </span>
+
             </div>
+
         </header>
 
 
         <main id="wallContainer">
 
-            <canvas id="wallCanvas"></canvas>
+            <canvas
+                id="wallCanvas"
+            ></canvas>
+
 
             <div id="loading">
+
                 <div class="loader"></div>
-                <span>Entering The Wall...</span>
+
+                <span>
+                    Entering The Wall...
+                </span>
+
             </div>
 
 
-            <div class="coordinates" id="coordinates">
+            <div
+                class="coordinates"
+                id="coordinates"
+            >
                 X: 0 · Y: 0
             </div>
 
 
             <div class="controls">
 
-                <button id="zoomOut" aria-label="Zoom out">
+                <button
+                    id="zoomOut"
+                    aria-label="Zoom out"
+                >
                     −
                 </button>
 
@@ -59,59 +120,134 @@
                     100%
                 </div>
 
-                <button id="zoomIn" aria-label="Zoom in">
+                <button
+                    id="zoomIn"
+                    aria-label="Zoom in"
+                >
                     +
                 </button>
 
-                <button id="resetView" aria-label="Reset view">
+                <button
+                    id="resetView"
+                    aria-label="Reset view"
+                >
                     ⌂
                 </button>
 
             </div>
 
 
-            <div class="palette" id="palette"></div>
+            <div
+                class="palette"
+                id="palette"
+            ></div>
 
 
             <div class="info-panel">
 
                 <div>
-                    <strong id="pixelCount">0</strong>
-                    <span>pixels</span>
+
+                    <strong
+                        id="pixelCount"
+                    >
+                        0
+                    </strong>
+
+                    <span>
+                        pixels
+                    </span>
+
                 </div>
 
+
                 <div>
-                    <strong>10,000</strong>
-                    <span>× 10,000</span>
+
+                    <strong>
+                        10,000
+                    </strong>
+
+                    <span>
+                        × 10,000
+                    </span>
+
                 </div>
 
             </div>
 
 
-            <div class="selected-pixel" id="selectedPixel">
+            <div
+                class="selected-pixel"
+                id="selectedPixel"
+            >
 
                 <div class="selected-header">
-                    <span>PIXEL</span>
-                    <button id="closePixel">×</button>
+
+                    <span>
+                        PIXEL
+                    </span>
+
+                    <button
+                        id="closePixel"
+                        aria-label="Close pixel information"
+                    >
+                        ×
+                    </button>
+
                 </div>
 
-                <div class="pixel-preview" id="pixelPreview"></div>
+
+                <div
+                    class="pixel-preview"
+                    id="pixelPreview"
+                ></div>
+
 
                 <div class="pixel-data">
-                    <div>
-                        <span>X</span>
-                        <strong id="pixelX">0</strong>
-                    </div>
 
                     <div>
-                        <span>Y</span>
-                        <strong id="pixelY">0</strong>
+
+                        <span>
+                            X
+                        </span>
+
+                        <strong
+                            id="pixelX"
+                        >
+                            0
+                        </strong>
+
                     </div>
 
+
                     <div>
-                        <span>COLOR</span>
-                        <strong id="pixelColor">#000000</strong>
+
+                        <span>
+                            Y
+                        </span>
+
+                        <strong
+                            id="pixelY"
+                        >
+                            0
+                        </strong>
+
                     </div>
+
+
+                    <div>
+
+                        <span>
+                            COLOR
+                        </span>
+
+                        <strong
+                            id="pixelColor"
+                        >
+                            #000000
+                        </strong>
+
+                    </div>
+
                 </div>
 
             </div>
@@ -120,15 +256,26 @@
 
 
         <footer>
-            <span>The Wall</span>
-            <span>•</span>
-            <span>Every pixel tells a story.</span>
+
+            <span>
+                The Wall
+            </span>
+
+            <span>
+                •
+            </span>
+
+            <span>
+                Every pixel tells a story.
+            </span>
+
         </footer>
 
     </div>
 
 
     <script src="config.js"></script>
+    <script src="splash.js"></script>
     <script src="supabase.js"></script>
     <script src="wall.js"></script>
     <script src="ui.js"></script>

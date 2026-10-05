@@ -44,13 +44,11 @@ class Wall {
         this.isDragging =
             false;
 
-
         this.dragStartX =
             0;
 
         this.dragStartY =
             0;
-
 
         this.startOffsetX =
             0;
@@ -66,10 +64,13 @@ class Wall {
         this.pointers =
             new Map();
 
-
         this.lastPinchDistance =
             null;
 
+
+        /*
+         * Pixels
+         */
 
         this.pixels =
             new Map();
@@ -77,9 +78,6 @@ class Wall {
 
         /*
          * Tool
-         *
-         * paint
-         * eraser
          */
 
         this.tool =
@@ -89,6 +87,37 @@ class Wall {
         this.selectedColor =
             0;
 
+
+        /*
+         * Brush
+         */
+
+        this.brushSizes =
+            [
+                1,
+                2,
+                3,
+                5,
+                10,
+                25,
+                50
+            ];
+
+        this.brushSize =
+            1;
+
+
+        /*
+         * Cursor
+         */
+
+        this.cursor =
+            null;
+
+
+        /*
+         * Palette
+         */
 
         this.palette = [
 
@@ -140,14 +169,12 @@ class Wall {
         this.canvas.width =
             rect.width * dpr;
 
-
         this.canvas.height =
             rect.height * dpr;
 
 
         this.canvas.style.width =
             `${rect.width}px`;
-
 
         this.canvas.style.height =
             `${rect.height}px`;
@@ -349,6 +376,169 @@ class Wall {
     }
 
 
+    /*
+     * Generate every pixel
+     * covered by the brush.
+     */
+
+    getBrushPoints(
+        center
+    ) {
+
+        const points = [];
+
+        const size =
+            this.brushSize;
+
+
+        const start =
+            Math.floor(
+                (size - 1) / 2
+            );
+
+
+        const end =
+            size - 1 - start;
+
+
+        for (
+            let dy = -start;
+            dy <= end;
+            dy++
+        ) {
+
+            for (
+                let dx = -start;
+                dx <= end;
+                dx++
+            ) {
+
+                const x =
+                    center.x +
+                    dx;
+
+                const y =
+                    center.y +
+                    dy;
+
+
+                if (
+                    x < 0 ||
+                    x >= this.size ||
+                    y < 0 ||
+                    y >= this.size
+                ) {
+
+                    continue;
+
+                }
+
+
+                points.push({
+                    x,
+                    y
+                });
+
+            }
+
+        }
+
+
+        return points;
+
+    }
+
+
+    /*
+     * Faint identity when
+     * viewing the whole Wall.
+     */
+
+    drawWallIdentity(
+        width,
+        height
+    ) {
+
+        if (
+            this.zoom > 0.18
+        ) {
+
+            return;
+
+        }
+
+
+        const centerX =
+            width / 2 +
+            this.offsetX;
+
+
+        const centerY =
+            height / 2 +
+            this.offsetY;
+
+
+        const alpha =
+            Math.max(
+                0,
+                Math.min(
+                    0.13,
+                    (
+                        0.18 -
+                        this.zoom
+                    ) /
+                    0.10 *
+                    0.13
+                )
+            );
+
+
+        this.ctx.save();
+
+
+        this.ctx.globalAlpha =
+            alpha;
+
+
+        this.ctx.textAlign =
+            "center";
+
+
+        this.ctx.textBaseline =
+            "middle";
+
+
+        this.ctx.fillStyle =
+            "#FFFFFF";
+
+
+        this.ctx.font =
+            "600 44px Inter, system-ui, sans-serif";
+
+
+        this.ctx.fillText(
+            "The Wall",
+            centerX,
+            centerY
+        );
+
+
+        this.ctx.font =
+            "500 9px Inter, system-ui, sans-serif";
+
+
+        this.ctx.fillText(
+            "BUILT BY EVERYONE",
+            centerX,
+            centerY + 38
+        );
+
+
+        this.ctx.restore();
+
+    }
+
+
     render() {
 
         const rect =
@@ -362,6 +552,10 @@ class Wall {
         const height =
             rect.height;
 
+
+        /*
+         * Background
+         */
 
         this.ctx.fillStyle =
             "#080808";
@@ -611,6 +805,130 @@ class Wall {
 
         }
 
+
+        /*
+         * The Wall identity
+         */
+
+        this.drawWallIdentity(
+            width,
+            height
+        );
+
+
+        /*
+         * Brush preview
+         */
+
+        if (
+            this.cursor
+        ) {
+
+            const points =
+                this.getBrushPoints(
+                    this.cursor
+                );
+
+
+            if (
+                points.length
+            ) {
+
+                const xs =
+                    points.map(
+                        point =>
+                            point.x
+                    );
+
+
+                const ys =
+                    points.map(
+                        point =>
+                            point.y
+                    );
+
+
+                const minX =
+                    Math.min(
+                        ...xs
+                    );
+
+
+                const maxX =
+                    Math.max(
+                        ...xs
+                    );
+
+
+                const minY =
+                    Math.min(
+                        ...ys
+                    );
+
+
+                const maxY =
+                    Math.max(
+                        ...ys
+                    );
+
+
+                const top =
+                    this.worldToScreen(
+                        minX,
+                        minY
+                    );
+
+
+                const bottom =
+                    this.worldToScreen(
+                        maxX + 1,
+                        maxY + 1
+                    );
+
+
+                this.ctx.save();
+
+
+                this.ctx.strokeStyle =
+                    this.tool ===
+                    "eraser"
+
+                        ? "rgba(255,255,255,.8)"
+
+                        : "rgba(255,255,255,.65)";
+
+
+                this.ctx.lineWidth =
+                    1;
+
+
+                this.ctx.setLineDash(
+                    [3, 3]
+                );
+
+
+                this.ctx.strokeRect(
+                    top.x,
+                    top.y,
+                    Math.max(
+                        this.zoom,
+                        bottom.x -
+                            top.x
+                    ),
+                    Math.max(
+                        this.zoom,
+                        bottom.y -
+                            top.y
+                    )
+                );
+
+
+                this.ctx.restore();
+
+            }
+
+        }
+
     }
 
 
@@ -632,7 +950,8 @@ class Wall {
                 this.minZoom,
                 Math.min(
                     this.maxZoom,
-                    this.zoom * factor
+                    this.zoom *
+                    factor
                 )
             );
 
@@ -673,8 +992,7 @@ class Wall {
     setupInput() {
 
         /*
-         * Prevent browser
-         * context menu.
+         * No browser context menu.
          */
 
         this.canvas.addEventListener(
@@ -713,8 +1031,7 @@ class Wall {
 
 
                 /*
-                 * Two fingers:
-                 * pinch mode
+                 * Pinch
                  */
 
                 if (
@@ -765,6 +1082,15 @@ class Wall {
                 this.startOffsetY =
                     this.offsetY;
 
+
+                this.cursor =
+                    this.getWorldPoint(
+                        event
+                    );
+
+
+                this.render();
+
             }
         );
 
@@ -812,11 +1138,34 @@ class Wall {
                     rect.top;
 
 
-                updateCoordinates(
+                const world =
                     this.screenToWorld(
                         x,
                         y
-                    )
+                    );
+
+
+                const point = {
+
+                    x:
+                        this.clampCoordinate(
+                            world.x
+                        ),
+
+                    y:
+                        this.clampCoordinate(
+                            world.y
+                        )
+
+                };
+
+
+                this.cursor =
+                    point;
+
+
+                updateCoordinates(
+                    point
                 );
 
 
@@ -893,6 +1242,8 @@ class Wall {
                     !this.isDragging
                 ) {
 
+                    this.render();
+
                     return;
 
                 }
@@ -944,7 +1295,8 @@ class Wall {
 
 
                 if (
-                    this.pointers.size > 0
+                    this.pointers.size >
+                    0
                 ) {
 
                     return;
@@ -976,7 +1328,7 @@ class Wall {
 
 
                 /*
-                 * Was a drag.
+                 * Actual drag
                  */
 
                 if (
@@ -994,46 +1346,33 @@ class Wall {
                     );
 
 
-                /*
-                 * Right click:
-                 * erase
-                 */
-
-                if (
-                    event.button === 2
-                ) {
-
-                    this.onPixelErase?.(
-                        point.x,
-                        point.y
+                const points =
+                    this.getBrushPoints(
+                        point
                     );
 
 
-                    return;
-
-                }
-
-
                 /*
-                 * Left click:
-                 * current tool
+                 * Right click always
+                 * acts as eraser.
                  */
 
                 if (
+                    event.button === 2 ||
                     this.tool ===
                     "eraser"
                 ) {
 
                     this.onPixelErase?.(
-                        point.x,
-                        point.y
+                        points
                     );
 
-                } else {
+                }
+
+                else {
 
                     this.onPixelClick?.(
-                        point.x,
-                        point.y
+                        points
                     );
 
                 }
@@ -1054,7 +1393,25 @@ class Wall {
 
 
         /*
-         * Desktop wheel zoom
+         * Cursor disappears
+         * outside the Wall.
+         */
+
+        this.canvas.addEventListener(
+            "pointerleave",
+            () => {
+
+                this.cursor =
+                    null;
+
+                this.render();
+
+            }
+        );
+
+
+        /*
+         * Wheel zoom
          */
 
         this.canvas.addEventListener(

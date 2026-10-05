@@ -1,51 +1,91 @@
 (() => {
-    const splash = document.getElementById("splash");
-    const art = document.getElementById("splashArt");
 
-    if (!splash || !art) return;
+    const splash =
+        document.getElementById("splash");
 
-    let animationReady = false;
-    let appReady = false;
-    let finished = false;
+    const art =
+        document.getElementById("splashArt");
 
-    const total = 64;
-
-    for (let i = 0; i < total; i++) {
-        const pixel = document.createElement("div");
-        pixel.className = "splash-pixel";
-        pixel.style.animationDelay = `${i * 0.025}s`;
-        art.appendChild(pixel);
+    if (!splash || !art) {
+        return;
     }
 
-    const tryFinish = () => {
-        if (finished || !animationReady || !appReady) return;
 
-        finished = true;
+    /*
+     * Create 8 × 8 pixel artwork.
+     */
 
-        splash.classList.add("done");
+    const columns = 8;
+    const rows = 8;
+    const total = columns * rows;
+
+
+    for (let i = 0; i < total; i++) {
+
+        const pixel =
+            document.createElement("div");
+
+        pixel.className =
+            "splash-pixel";
+
+
+        /*
+         * Pixel-by-pixel reveal.
+         */
+
+        pixel.style.animationDelay =
+            `${i * 0.025}s`;
+
+
+        art.appendChild(pixel);
+
+    }
+
+
+    /*
+     * Start title animation after
+     * the wall artwork has appeared.
+     */
+
+    const titleDelay =
+        (total * 25) + 350;
+
+
+    setTimeout(() => {
+
+        splash.classList.add(
+            "ready"
+        );
+
+    }, titleDelay);
+
+
+    /*
+     * Automatically dismiss the splash.
+     *
+     * It intentionally does NOT depend on
+     * Supabase or app.js.
+     */
+
+    setTimeout(() => {
+
+        splash.classList.add(
+            "done"
+        );
+
+
+        /*
+         * Remove it completely after
+         * the fade animation.
+         */
 
         setTimeout(() => {
+
             splash.remove();
+
         }, 700);
-    };
 
-    setTimeout(() => {
-        animationReady = true;
-        splash.classList.add("ready");
+    }, 3000);
 
-        setTimeout(tryFinish, 500);
-    }, total * 25 + 900);
 
-    window.finishWallSplash = () => {
-        appReady = true;
-        tryFinish();
-    };
-
-    setTimeout(() => {
-        if (!finished) {
-            animationReady = true;
-            appReady = true;
-            tryFinish();
-        }
-    }, 5000);
 })();

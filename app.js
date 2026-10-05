@@ -315,21 +315,6 @@ async function start() {
             "hidden"
         );
 
-
-        /*
-         * The Wall is ready.
-         * Tell the splash screen to disappear.
-         */
-
-        if (
-            typeof window.finishWallSplash ===
-            "function"
-        ) {
-
-            window.finishWallSplash();
-
-        }
-
     }
 
     catch (error) {
@@ -342,6 +327,7 @@ async function start() {
         connectionText.textContent =
             "Offline";
 
+
         connectionDot.classList.add(
             "offline"
         );
@@ -351,21 +337,6 @@ async function start() {
             <strong>Unable to enter The Wall.</strong>
             <span>Check your Supabase configuration.</span>
         `;
-
-
-        /*
-         * Do not leave the splash screen
-         * covering the error forever.
-         */
-
-        if (
-            typeof window.finishWallSplash ===
-            "function"
-        ) {
-
-            window.finishWallSplash();
-
-        }
 
     }
 

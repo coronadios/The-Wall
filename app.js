@@ -178,6 +178,54 @@ async function start() {
 
 
         /*
+         * Pixel erasing.
+         */
+
+        wall.onPixelErase =
+            async (
+                x,
+                y
+            ) => {
+
+                try {
+
+                    await erasePixel(
+                        x,
+                        y
+                    );
+
+
+                    wall.deletePixel({
+                        x,
+                        y
+                    });
+
+
+                    updatePixelCount(
+                        wall.pixels.size
+                    );
+
+
+                    hidePixel();
+
+                }
+
+                catch (error) {
+
+                    console.error(
+                        error
+                    );
+
+                    alert(
+                        "Could not erase pixel. Check your Supabase DELETE policy."
+                    );
+
+                }
+
+            };
+
+
+        /*
          * Controls.
          */
 
@@ -267,6 +315,21 @@ async function start() {
             "hidden"
         );
 
+
+        /*
+         * The Wall is ready.
+         * Tell the splash screen to disappear.
+         */
+
+        if (
+            typeof window.finishWallSplash ===
+            "function"
+        ) {
+
+            window.finishWallSplash();
+
+        }
+
     }
 
     catch (error) {
@@ -288,6 +351,21 @@ async function start() {
             <strong>Unable to enter The Wall.</strong>
             <span>Check your Supabase configuration.</span>
         `;
+
+
+        /*
+         * Do not leave the splash screen
+         * covering the error forever.
+         */
+
+        if (
+            typeof window.finishWallSplash ===
+            "function"
+        ) {
+
+            window.finishWallSplash();
+
+        }
 
     }
 

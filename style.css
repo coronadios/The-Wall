@@ -1,21 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url(
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap'
+);
 
 
 :root {
 
     --bg: #050505;
-    --surface: rgba(18,18,18,.88);
-    --border: rgba(255,255,255,.09);
 
-    --text: #f5f5f5;
-    --muted: #858585;
+    --surface:
+        rgba(18, 18, 18, .88);
+
+    --border:
+        rgba(255, 255, 255, .09);
+
+    --text:
+        #f5f5f5;
+
+    --muted:
+        #858585;
 
 }
 
 
 * {
 
-    box-sizing: border-box;
+    box-sizing:
+        border-box;
 
 }
 
@@ -23,12 +33,17 @@
 html,
 body {
 
-    margin: 0;
+    margin:
+        0;
 
-    width: 100%;
-    height: 100%;
+    width:
+        100%;
 
-    overflow: hidden;
+    height:
+        100%;
+
+    overflow:
+        hidden;
 
     background:
         var(--bg);
@@ -54,27 +69,225 @@ button {
 
 #app {
 
-    width: 100%;
-    height: 100%;
+    width:
+        100%;
 
-    display: flex;
-    flex-direction: column;
+    height:
+        100%;
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
 
 }
 
 
-/* TOPBAR */
+/* =========================================================
+   SPLASH
+========================================================= */
+
+#splash {
+
+    position:
+        fixed;
+
+    inset:
+        0;
+
+    z-index:
+        100;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex-direction:
+        column;
+
+    background:
+        #050505;
+
+    transition:
+        opacity .65s ease,
+        visibility .65s ease;
+
+}
+
+
+#splash.done {
+
+    opacity:
+        0;
+
+    visibility:
+        hidden;
+
+    pointer-events:
+        none;
+
+}
+
+
+.splash-art {
+
+    width:
+        96px;
+
+    height:
+        96px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(8, 1fr);
+
+    gap:
+        1px;
+
+    margin-bottom:
+        28px;
+
+}
+
+
+.splash-pixel {
+
+    background:
+        #f5f5f5;
+
+    opacity:
+        0;
+
+    transform:
+        scale(.75);
+
+    animation:
+        splashPixel .08s ease forwards;
+
+}
+
+
+@keyframes splashPixel {
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+.splash-title {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    gap:
+        7px;
+
+    opacity:
+        0;
+
+    transform:
+        translateY(8px);
+
+}
+
+
+#splash.ready
+.splash-title {
+
+    animation:
+        splashTitle .6s ease forwards;
+
+}
+
+
+.splash-title strong {
+
+    font-size:
+        25px;
+
+    font-weight:
+        600;
+
+    letter-spacing:
+        -.05em;
+
+}
+
+
+.splash-title span {
+
+    font-size:
+        10px;
+
+    color:
+        var(--muted);
+
+    letter-spacing:
+        .16em;
+
+    text-transform:
+        uppercase;
+
+}
+
+
+@keyframes splashTitle {
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 .topbar {
 
     position:
         fixed;
 
-    top: 0;
-    left: 0;
-    right: 0;
+    top:
+        0;
 
-    height: 70px;
+    left:
+        0;
+
+    right:
+        0;
+
+    height:
+        70px;
 
     padding:
         0 22px;
@@ -88,7 +301,8 @@ button {
     justify-content:
         space-between;
 
-    z-index: 20;
+    z-index:
+        20;
 
     pointer-events:
         none;
@@ -104,7 +318,8 @@ button {
     align-items:
         center;
 
-    gap: 11px;
+    gap:
+        11px;
 
     pointer-events:
         auto;
@@ -114,8 +329,11 @@ button {
 
 .brand-mark {
 
-    width: 25px;
-    height: 25px;
+    width:
+        25px;
+
+    height:
+        25px;
 
     border:
         2px solid white;
@@ -128,30 +346,40 @@ button {
 
 .brand-mark::after {
 
-    content: "";
+    content:
+        "";
 
     position:
         absolute;
 
-    width: 7px;
-    height: 7px;
+    width:
+        7px;
+
+    height:
+        7px;
 
     background:
         white;
 
-    left: 7px;
-    top: 7px;
+    left:
+        7px;
+
+    top:
+        7px;
 
 }
 
 
 h1 {
 
-    margin: 0;
+    margin:
+        0;
 
-    font-size: 16px;
+    font-size:
+        16px;
 
-    font-weight: 600;
+    font-weight:
+        600;
 
     letter-spacing:
         -.03em;
@@ -164,7 +392,8 @@ h1 {
     color:
         var(--muted);
 
-    font-size: 10px;
+    font-size:
+        10px;
 
     text-transform:
         uppercase;
@@ -186,13 +415,14 @@ h1 {
     align-items:
         center;
 
-    gap: 7px;
+    gap:
+        7px;
 
     padding:
         8px 11px;
 
     background:
-        rgba(10,10,10,.7);
+        rgba(10, 10, 10, .7);
 
     border:
         1px solid var(--border);
@@ -214,8 +444,11 @@ h1 {
 
 #connectionDot {
 
-    width: 6px;
-    height: 6px;
+    width:
+        6px;
+
+    height:
+        6px;
 
     border-radius:
         50%;
@@ -233,7 +466,7 @@ h1 {
 
     box-shadow:
         0 0 10px
-        rgba(52,199,89,.7);
+        rgba(52, 199, 89, .7);
 
 }
 
@@ -246,14 +479,17 @@ h1 {
 }
 
 
-/* WALL */
+/* =========================================================
+   WALL
+========================================================= */
 
 #wallContainer {
 
     position:
         relative;
 
-    flex: 1;
+    flex:
+        1;
 
     overflow:
         hidden;
@@ -272,13 +508,21 @@ h1 {
     inset:
         0;
 
+    width:
+        100%;
+
+    height:
+        100%;
+
     touch-action:
         none;
 
 }
 
 
-/* LOADING */
+/* =========================================================
+   LOADING
+========================================================= */
 
 #loading {
 
@@ -334,8 +578,11 @@ h1 {
 
 .loader {
 
-    width: 18px;
-    height: 18px;
+    width:
+        18px;
+
+    height:
+        18px;
 
     border:
         2px solid #333;
@@ -355,14 +602,18 @@ h1 {
 @keyframes spin {
 
     to {
+
         transform:
             rotate(360deg);
+
     }
 
 }
 
 
-/* COORDINATES */
+/* =========================================================
+   COORDINATES
+========================================================= */
 
 .coordinates {
 
@@ -402,7 +653,9 @@ h1 {
 }
 
 
-/* CONTROLS */
+/* =========================================================
+   CONTROLS
+========================================================= */
 
 .controls {
 
@@ -474,7 +727,7 @@ h1 {
 .controls button:hover {
 
     background:
-        rgba(255,255,255,.08);
+        rgba(255, 255, 255, .08);
 
 }
 
@@ -496,7 +749,9 @@ h1 {
 }
 
 
-/* PALETTE */
+/* =========================================================
+   PALETTE
+========================================================= */
 
 .palette {
 
@@ -514,6 +769,9 @@ h1 {
 
     display:
         flex;
+
+    align-items:
+        center;
 
     gap:
         6px;
@@ -533,10 +791,16 @@ h1 {
     backdrop-filter:
         blur(14px);
 
+    max-width:
+        calc(100vw - 30px);
+
 }
 
 
 .palette-color {
+
+    flex:
+        0 0 auto;
 
     width:
         22px;
@@ -548,7 +812,8 @@ h1 {
         50%;
 
     border:
-        2px solid rgba(255,255,255,.12);
+        2px solid
+        rgba(255, 255, 255, .12);
 
     cursor:
         pointer;
@@ -581,7 +846,37 @@ h1 {
 }
 
 
-/* INFO */
+.palette-color.eraser {
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    background:
+        #171717;
+
+    color:
+        #aaa;
+
+    font-size:
+        13px;
+
+}
+
+
+.palette-color.eraser span {
+
+    transform:
+        translateY(-1px);
+
+}
+
+
+/* =========================================================
+   INFO
+========================================================= */
 
 .info-panel {
 
@@ -651,7 +946,9 @@ h1 {
 }
 
 
-/* SELECTED PIXEL */
+/* =========================================================
+   SELECTED PIXEL
+========================================================= */
 
 .selected-pixel {
 
@@ -770,7 +1067,7 @@ h1 {
 
     border:
         1px solid
-        rgba(255,255,255,.1);
+        rgba(255, 255, 255, .1);
 
 }
 
@@ -822,7 +1119,9 @@ h1 {
 }
 
 
-/* FOOTER */
+/* =========================================================
+   FOOTER
+========================================================= */
 
 footer {
 
@@ -851,7 +1150,7 @@ footer {
         8px;
 
     color:
-        rgba(255,255,255,.25);
+        rgba(255, 255, 255, .25);
 
     pointer-events:
         none;
@@ -859,18 +1158,74 @@ footer {
 }
 
 
+/* =========================================================
+   MOBILE
+========================================================= */
+
 @media (max-width: 700px) {
 
-    .palette {
+    .topbar {
 
-        bottom:
-            60px;
+        height:
+            58px;
 
-        max-width:
-            calc(100vw - 30px);
+        padding:
+            0 12px;
 
-        overflow:
-            auto;
+    }
+
+
+    .brand-mark {
+
+        width:
+            22px;
+
+        height:
+            22px;
+
+    }
+
+
+    .brand-mark::after {
+
+        width:
+            6px;
+
+        height:
+            6px;
+
+        left:
+            6px;
+
+        top:
+            6px;
+
+    }
+
+
+    h1 {
+
+        font-size:
+            14px;
+
+    }
+
+
+    .brand span {
+
+        display:
+            none;
+
+    }
+
+
+    .status {
+
+        padding:
+            7px 9px;
+
+        font-size:
+            10px;
 
     }
 
@@ -883,10 +1238,132 @@ footer {
     }
 
 
+    .palette {
+
+        left:
+            10px;
+
+        right:
+            10px;
+
+        bottom:
+            max(
+                14px,
+                env(safe-area-inset-bottom)
+            );
+
+        width:
+            auto;
+
+        max-width:
+            none;
+
+        transform:
+            none;
+
+        overflow-x:
+            auto;
+
+        justify-content:
+            flex-start;
+
+        padding:
+            10px 12px;
+
+        scrollbar-width:
+            none;
+
+    }
+
+
+    .palette::-webkit-scrollbar {
+
+        display:
+            none;
+
+    }
+
+
+    .palette-color {
+
+        width:
+            29px;
+
+        height:
+            29px;
+
+    }
+
+
+    .controls {
+
+        right:
+            10px;
+
+        bottom:
+            calc(
+                70px +
+                env(safe-area-inset-bottom)
+            );
+
+    }
+
+
+    .controls button {
+
+        width:
+            38px;
+
+        height:
+            38px;
+
+    }
+
+
+    #zoomValue {
+
+        min-width:
+            44px;
+
+    }
+
+
+    .coordinates {
+
+        left:
+            10px;
+
+        bottom:
+            calc(
+                78px +
+                env(safe-area-inset-bottom)
+            );
+
+        font-size:
+            9px;
+
+    }
+
+
     .selected-pixel {
 
+        left:
+            10px;
+
+        right:
+            10px;
+
         top:
-            78px;
+            auto;
+
+        bottom:
+            calc(
+                125px +
+                env(safe-area-inset-bottom)
+            );
+
+        width:
+            auto;
 
     }
 

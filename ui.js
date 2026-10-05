@@ -1,56 +1,170 @@
 const paletteElement =
-    document.getElementById("palette");
+    document.getElementById(
+        "palette"
+    );
+
 
 const coordinatesElement =
-    document.getElementById("coordinates");
+    document.getElementById(
+        "coordinates"
+    );
+
 
 const zoomValueElement =
-    document.getElementById("zoomValue");
+    document.getElementById(
+        "zoomValue"
+    );
+
 
 const pixelCountElement =
-    document.getElementById("pixelCount");
+    document.getElementById(
+        "pixelCount"
+    );
+
 
 const selectedPixelElement =
-    document.getElementById("selectedPixel");
+    document.getElementById(
+        "selectedPixel"
+    );
+
 
 const pixelPreviewElement =
-    document.getElementById("pixelPreview");
+    document.getElementById(
+        "pixelPreview"
+    );
+
 
 const pixelXElement =
-    document.getElementById("pixelX");
+    document.getElementById(
+        "pixelX"
+    );
+
 
 const pixelYElement =
-    document.getElementById("pixelY");
+    document.getElementById(
+        "pixelY"
+    );
+
 
 const pixelColorElement =
-    document.getElementById("pixelColor");
+    document.getElementById(
+        "pixelColor"
+    );
 
 
-function buildPalette(wall) {
+function buildPalette(
+    wall
+) {
 
-    paletteElement.innerHTML = "";
+    paletteElement.innerHTML =
+        "";
 
 
-    wall.palette.forEach(
-        (color, index) => {
+    const items = [
+
+        ...wall.palette.map(
+            (
+                color,
+                index
+            ) => ({
+                type:
+                    "color",
+
+                color,
+                index
+            })
+        ),
+
+        {
+            type:
+                "eraser"
+        }
+
+    ];
+
+
+    items.forEach(
+        item => {
 
             const button =
-                document.createElement("button");
+                document.createElement(
+                    "button"
+                );
+
 
             button.className =
                 "palette-color";
 
-            button.style.background =
-                color;
 
-            button.dataset.color =
-                index;
+            /*
+             * Color
+             */
+
+            if (
+                item.type ===
+                "color"
+            ) {
+
+                button.style.background =
+                    item.color;
 
 
-            if (index === 0) {
+                button.dataset.color =
+                    item.index;
+
+
+                button.setAttribute(
+                    "aria-label",
+                    `Color ${item.color}`
+                );
+
+            }
+
+
+            /*
+             * Eraser
+             */
+
+            if (
+                item.type ===
+                "eraser"
+            ) {
+
+                button.classList.add(
+                    "eraser"
+                );
+
+
+                button.innerHTML =
+                    "<span>⌫</span>";
+
+
+                button.title =
+                    "Borrador";
+
+
+                button.setAttribute(
+                    "aria-label",
+                    "Borrador"
+                );
+
+            }
+
+
+            /*
+             * First color active
+             */
+
+            if (
+                item.type ===
+                "color" &&
+                item.index === 0
+            ) {
+
                 button.classList.add(
                     "active"
                 );
+
             }
 
 
@@ -63,10 +177,13 @@ function buildPalette(wall) {
                             ".palette-color"
                         )
                         .forEach(
-                            element =>
+                            element => {
+
                                 element.classList.remove(
                                     "active"
-                                )
+                                );
+
+                            }
                         );
 
 
@@ -75,8 +192,24 @@ function buildPalette(wall) {
                     );
 
 
-                    wall.selectedColor =
-                        index;
+                    if (
+                        item.type ===
+                        "eraser"
+                    ) {
+
+                        wall.tool =
+                            "eraser";
+
+                    } else {
+
+                        wall.tool =
+                            "paint";
+
+
+                        wall.selectedColor =
+                            item.index;
+
+                    }
 
                 }
             );
@@ -92,7 +225,9 @@ function buildPalette(wall) {
 }
 
 
-function updateCoordinates(position) {
+function updateCoordinates(
+    position
+) {
 
     coordinatesElement.textContent =
         `X: ${position.x} · Y: ${position.y}`;
@@ -100,7 +235,9 @@ function updateCoordinates(position) {
 }
 
 
-function updateZoomUI(zoom) {
+function updateZoomUI(
+    zoom
+) {
 
     zoomValueElement.textContent =
         `${Math.round(
@@ -110,7 +247,9 @@ function updateZoomUI(zoom) {
 }
 
 
-function updatePixelCount(count) {
+function updatePixelCount(
+    count
+) {
 
     pixelCountElement.textContent =
         count.toLocaleString();
@@ -136,8 +275,10 @@ function showPixel(
     pixelXElement.textContent =
         x;
 
+
     pixelYElement.textContent =
         y;
+
 
     pixelColorElement.textContent =
         hex;

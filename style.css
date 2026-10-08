@@ -3,15 +3,26 @@
 );
 
 
+/* =========================================================
+   ROOT
+========================================================= */
+
 :root {
 
-    --bg: #050505;
+    --bg:
+        #050505;
 
     --surface:
         rgba(18, 18, 18, .88);
 
+    --surface-soft:
+        rgba(255, 255, 255, .045);
+
     --border:
         rgba(255, 255, 255, .09);
+
+    --border-strong:
+        rgba(255, 255, 255, .14);
 
     --text:
         #f5f5f5;
@@ -64,8 +75,15 @@ button {
     font:
         inherit;
 
+    -webkit-tap-highlight-color:
+        transparent;
+
 }
 
+
+/* =========================================================
+   APP
+========================================================= */
 
 #app {
 
@@ -111,12 +129,64 @@ button {
     flex-direction:
         column;
 
+    overflow:
+        hidden;
+
     background:
         #050505;
 
+    opacity:
+        1;
+
     transition:
-        opacity .65s ease,
-        visibility .65s ease;
+        opacity .8s cubic-bezier(.22,1,.36,1),
+        visibility .8s ease;
+
+}
+
+
+#splash::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    width:
+        420px;
+
+    height:
+        420px;
+
+    left:
+        50%;
+
+    top:
+        50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(255,255,255,.055) 0%,
+            rgba(255,255,255,.018) 35%,
+            transparent 72%
+        );
+
+    opacity:
+        0;
+
+    animation:
+        splashAmbient 1.8s
+        cubic-bezier(.22,1,.36,1)
+        .1s
+        forwards;
+
+    pointer-events:
+        none;
 
 }
 
@@ -137,6 +207,9 @@ button {
 
 .splash-art {
 
+    position:
+        relative;
+
     width:
         96px;
 
@@ -155,10 +228,30 @@ button {
     margin-bottom:
         28px;
 
+    transform:
+        scale(.94);
+
+    opacity:
+        .98;
+
+    filter:
+        drop-shadow(
+            0 0 0
+            rgba(255,255,255,0)
+        );
+
+    animation:
+        splashArtIn .9s
+        cubic-bezier(.22,1,.36,1)
+        forwards;
+
 }
 
 
 .splash-pixel {
+
+    position:
+        relative;
 
     background:
         #f5f5f5;
@@ -167,25 +260,40 @@ button {
         0;
 
     transform:
-        scale(.75);
+        scale(.35);
+
+    transform-origin:
+        center;
 
     animation:
-        splashPixel .08s ease forwards;
+        splashPixel .18s
+        cubic-bezier(.22,1,.36,1)
+        forwards;
 
 }
 
 
-@keyframes splashPixel {
+.splash-pixel::after {
 
-    to {
+    content:
+        "";
 
-        opacity:
-            1;
+    position:
+        absolute;
 
-        transform:
-            scale(1);
+    inset:
+        0;
 
-    }
+    background:
+        rgba(255,255,255,.5);
+
+    opacity:
+        0;
+
+    animation:
+        splashPixelGlow .2s
+        ease
+        forwards;
 
 }
 
@@ -208,7 +316,11 @@ button {
         0;
 
     transform:
-        translateY(8px);
+        translateY(10px)
+        scale(.985);
+
+    filter:
+        blur(6px);
 
 }
 
@@ -217,7 +329,10 @@ button {
 .splash-title {
 
     animation:
-        splashTitle .6s ease forwards;
+        splashTitle
+        .72s
+        cubic-bezier(.22,1,.36,1)
+        forwards;
 
 }
 
@@ -253,15 +368,139 @@ button {
 }
 
 
-@keyframes splashTitle {
+@keyframes splashAmbient {
 
-    to {
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            translate(-50%, -50%)
+            scale(.8);
+
+    }
+
+    100% {
 
         opacity:
             1;
 
         transform:
-            translateY(0);
+            translate(-50%, -50%)
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes splashArtIn {
+
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            scale(.86);
+
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes splashPixel {
+
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            scale(.25);
+
+    }
+
+    60% {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1.08);
+
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            scale(1);
+
+    }
+
+}
+
+
+@keyframes splashPixelGlow {
+
+    0% {
+
+        opacity:
+            .35;
+
+    }
+
+    100% {
+
+        opacity:
+            0;
+
+    }
+
+}
+
+
+@keyframes splashTitle {
+
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            translateY(10px)
+            scale(.985);
+
+        filter:
+            blur(6px);
+
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+        filter:
+            blur(0);
 
     }
 
@@ -336,10 +575,15 @@ button {
         25px;
 
     border:
-        2px solid white;
+        2px solid
+        white;
 
     position:
         relative;
+
+    transition:
+        transform .2s ease,
+        opacity .2s ease;
 
 }
 
@@ -366,6 +610,14 @@ button {
 
     top:
         7px;
+
+}
+
+
+.brand-mark:hover {
+
+    transform:
+        rotate(3deg);
 
 }
 
@@ -404,6 +656,10 @@ h1 {
 }
 
 
+/* =========================================================
+   LEGACY STATUS
+========================================================= */
+
 .status {
 
     pointer-events:
@@ -425,7 +681,8 @@ h1 {
         rgba(10, 10, 10, .7);
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     border-radius:
         999px;
@@ -443,6 +700,7 @@ h1 {
 
 
 #connectionDot {
+
     width:
         6px;
 
@@ -465,7 +723,7 @@ h1 {
 
     box-shadow:
         0 0 10px
-        rgba(52, 199, 89, .7);
+        rgba(52,199,89,.7);
 
 }
 
@@ -506,6 +764,9 @@ h1 {
 
     inset:
         0;
+
+    display:
+        block;
 
     width:
         100%;
@@ -584,7 +845,8 @@ h1 {
         18px;
 
     border:
-        2px solid #333;
+        2px solid
+        #333;
 
     border-top-color:
         white;
@@ -593,7 +855,9 @@ h1 {
         50%;
 
     animation:
-        spin .7s linear infinite;
+        spin .7s
+        linear
+        infinite;
 
 }
 
@@ -629,7 +893,8 @@ h1 {
         8px 11px;
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     background:
         var(--surface);
@@ -649,11 +914,14 @@ h1 {
     pointer-events:
         none;
 
+    user-select:
+        none;
+
 }
 
 
 /* =========================================================
-   CONTROLS
+   ZOOM CONTROLS
 ========================================================= */
 
 .controls {
@@ -683,7 +951,8 @@ h1 {
         var(--surface);
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     border-radius:
         10px;
@@ -701,6 +970,15 @@ h1 {
 
     height:
         32px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
 
     border:
         0;
@@ -720,13 +998,25 @@ h1 {
     cursor:
         pointer;
 
+    transition:
+        background .12s ease,
+        transform .12s ease;
+
 }
 
 
 .controls button:hover {
 
     background:
-        rgba(255, 255, 255, .08);
+        rgba(255,255,255,.08);
+
+}
+
+
+.controls button:active {
+
+    transform:
+        scale(.94);
 
 }
 
@@ -744,6 +1034,9 @@ h1 {
 
     color:
         var(--muted);
+
+    user-select:
+        none;
 
 }
 
@@ -779,7 +1072,8 @@ h1 {
         7px;
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     background:
         var(--surface);
@@ -792,6 +1086,9 @@ h1 {
 
     max-width:
         calc(100vw - 30px);
+
+    overflow:
+        hidden;
 
 }
 
@@ -807,12 +1104,18 @@ h1 {
     height:
         22px;
 
+    display:
+        grid;
+
+    place-items:
+        center;
+
     border-radius:
         50%;
 
     border:
         2px solid
-        rgba(255, 255, 255, .12);
+        rgba(255,255,255,.12);
 
     cursor:
         pointer;
@@ -821,7 +1124,8 @@ h1 {
         0;
 
     transition:
-        transform .12s ease;
+        transform .12s ease,
+        box-shadow .12s ease;
 
 }
 
@@ -829,7 +1133,15 @@ h1 {
 .palette-color:hover {
 
     transform:
-        scale(1.12);
+        scale(1.10);
+
+}
+
+
+.palette-color:active {
+
+    transform:
+        scale(.95);
 
 }
 
@@ -837,7 +1149,8 @@ h1 {
 .palette-color.active {
 
     outline:
-        2px solid white;
+        2px solid
+        white;
 
     outline-offset:
         2px;
@@ -846,12 +1159,6 @@ h1 {
 
 
 .palette-color.eraser {
-
-    display:
-        grid;
-
-    place-items:
-        center;
 
     background:
         #171717;
@@ -869,6 +1176,205 @@ h1 {
 
     transform:
         translateY(-1px);
+
+}
+
+
+/* =========================================================
+   BRUSH SIZE CONTROL
+   Works with the current ui.js markup.
+========================================================= */
+
+.palette .brush-control {
+
+    flex:
+        0 0 auto;
+
+    width:
+        auto;
+
+    min-width:
+        84px;
+
+    height:
+        30px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    gap:
+        2px;
+
+    padding:
+        3px;
+
+    border:
+        1px solid
+        rgba(255,255,255,.10);
+
+    border-radius:
+        8px;
+
+    background:
+        var(--surface-soft);
+
+    color:
+        var(--text);
+
+    cursor:
+        pointer;
+
+    outline:
+        none;
+
+}
+
+
+.palette .brush-control:hover {
+
+    transform:
+        none;
+
+    background:
+        rgba(255,255,255,.065);
+
+    border-color:
+        var(--border-strong);
+
+}
+
+
+.palette .brush-control:active {
+
+    transform:
+        none;
+
+}
+
+
+.palette .brush-control .brush-minus,
+.palette .brush-control .brush-plus {
+
+    width:
+        25px;
+
+    height:
+        24px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    flex:
+        0 0 25px;
+
+    border:
+        0;
+
+    border-radius:
+        6px;
+
+    background:
+        transparent;
+
+    color:
+        #a8a8a8;
+
+    font-size:
+        16px;
+
+    font-weight:
+        400;
+
+    line-height:
+        1;
+
+    opacity:
+        .78;
+
+    transition:
+        background .12s ease,
+        color .12s ease;
+
+}
+
+
+.palette .brush-control .brush-minus:hover,
+.palette .brush-control .brush-plus:hover {
+
+    background:
+        rgba(255,255,255,.08);
+
+    color:
+        #ffffff;
+
+}
+
+
+.palette .brush-control .brush-size {
+
+    min-width:
+        30px;
+
+    padding:
+        0 2px;
+
+    text-align:
+        center;
+
+    color:
+        #f5f5f5;
+
+    font-size:
+        10px;
+
+    font-weight:
+        600;
+
+    letter-spacing:
+        -.15px;
+
+    line-height:
+        1;
+
+    white-space:
+        nowrap;
+
+    user-select:
+        none;
+
+}
+
+
+/*
+ * Compatibility with the improved ui.js version,
+ * where .brush-minus and .brush-plus are real buttons.
+ */
+
+.palette .brush-control > button {
+
+    appearance:
+        none;
+
+}
+
+
+.palette .brush-control > button.brush-minus,
+.palette .brush-control > button.brush-plus {
+
+    margin:
+        0;
 
 }
 
@@ -912,7 +1418,8 @@ h1 {
         9px 11px;
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     background:
         var(--surface);
@@ -970,7 +1477,8 @@ h1 {
         var(--surface);
 
     border:
-        1px solid var(--border);
+        1px solid
+        var(--border);
 
     border-radius:
         11px;
@@ -988,7 +1496,8 @@ h1 {
         none;
 
     transition:
-        .2s ease;
+        opacity .2s ease,
+        transform .2s ease;
 
 }
 
@@ -1032,11 +1541,29 @@ h1 {
 
 .selected-header button {
 
+    width:
+        28px;
+
+    height:
+        28px;
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    margin:
+        -6px;
+
     background:
-        none;
+        transparent;
 
     border:
         0;
+
+    border-radius:
+        7px;
 
     color:
         var(--muted);
@@ -1046,6 +1573,17 @@ h1 {
 
     cursor:
         pointer;
+
+}
+
+
+.selected-header button:hover {
+
+    background:
+        rgba(255,255,255,.06);
+
+    color:
+        white;
 
 }
 
@@ -1066,7 +1604,7 @@ h1 {
 
     border:
         1px solid
-        rgba(255, 255, 255, .1);
+        rgba(255,255,255,.1);
 
 }
 
@@ -1149,9 +1687,12 @@ footer {
         8px;
 
     color:
-        rgba(255, 255, 255, .25);
+        rgba(255,255,255,.25);
 
     pointer-events:
+        none;
+
+    user-select:
         none;
 
 }
@@ -1263,14 +1804,20 @@ footer {
         overflow-x:
             auto;
 
+        overflow-y:
+            hidden;
+
         justify-content:
             flex-start;
 
         padding:
-            10px 12px;
+            9px 11px;
 
         scrollbar-width:
             none;
+
+        overscroll-behavior-x:
+            contain;
 
     }
 
@@ -1290,6 +1837,57 @@ footer {
 
         height:
             29px;
+
+    }
+
+
+    /*
+     * Mobile brush stays compact but receives
+     * larger hit targets.
+     */
+
+    .palette .brush-control {
+
+        min-width:
+            92px;
+
+        height:
+            37px;
+
+        padding:
+            4px;
+
+        border-radius:
+            9px;
+
+    }
+
+
+    .palette .brush-control .brush-minus,
+    .palette .brush-control .brush-plus {
+
+        width:
+            29px;
+
+        height:
+            29px;
+
+        flex-basis:
+            29px;
+
+        font-size:
+            17px;
+
+    }
+
+
+    .palette .brush-control .brush-size {
+
+        min-width:
+            30px;
+
+        font-size:
+            10px;
 
     }
 
@@ -1366,48 +1964,73 @@ footer {
 
     }
 
-    /* Brush size control */
-
-.brush-control {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    min-width: 76px;
-    padding: 0 9px;
-    cursor: pointer;
-}
-
-.brush-control .brush-minus,
-.brush-control .brush-plus {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    font-size: 17px;
-    line-height: 1;
-    opacity: .65;
-    transition: opacity .15s ease;
-}
-
-.brush-control .brush-minus:hover,
-.brush-control .brush-plus:hover {
-    opacity: 1;
-}
-
-.brush-control .brush-size {
-    min-width: 29px;
-    text-align: center;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: -.2px;
-}
 
     footer {
 
         display:
             none;
+
+    }
+
+
+    /*
+     * Slightly smaller splash on narrow
+     * screens without changing its identity.
+     */
+
+    .splash-art {
+
+        width:
+            82px;
+
+        height:
+            82px;
+
+        margin-bottom:
+            24px;
+
+    }
+
+
+    .splash-title strong {
+
+        font-size:
+            23px;
+
+    }
+
+
+    .splash-title span {
+
+        font-size:
+            9px;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+
+        animation-duration:
+            .01ms !important;
+
+        animation-iteration-count:
+            1 !important;
+
+        transition-duration:
+            .01ms !important;
+
+        scroll-behavior:
+            auto !important;
 
     }
 

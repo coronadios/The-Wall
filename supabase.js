@@ -96,35 +96,97 @@ async function initializeAuth() {
 
 async function loadPixels() {
 
-    const {
-        data,
-        error
-    } =
-        await supabaseClient
-            .from("pixels")
-            .select(
-                "x,y,color,user_id,created_at"
+    const pageSize = 1000;
+    let from = 0;
+
+    const allPixels = [];
+
+
+    while (true) {
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("pixels")
+                .select(
+                    "x,y,color,user_id,created_at"
+                )
+                .order(
+                    "x",
+                    {
+                        ascending: true
+                    }
+                )
+                .order(
+                    "y",
+                    {
+                        ascending: true
+                    }
+                )
+                .range(
+                    from,
+                    from + pageSize - 1
+                );
+
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "Pixel loading failed:",
+                error
             );
 
+            throw error;
 
-    if (
-        error
-    ) {
+        }
 
-        console.error(
-            "Pixel loading failed:",
-            error
+
+        if (
+            !data ||
+            data.length === 0
+        ) {
+
+            break;
+
+        }
+
+
+        allPixels.push(
+            ...data
         );
 
-        throw error;
+
+        /*
+         * Less than one complete page means
+         * we reached the end.
+         */
+
+        if (
+            data.length < pageSize
+        ) {
+
+            break;
+
+        }
+
+
+        from += pageSize;
 
     }
 
 
-    return data || [];
+    console.log(
+        `The Wall loaded ${allPixels.length} pixels.`
+    );
+
+
+    return allPixels;
 
 }
-
 
 /*
  * Realtime pixel updates

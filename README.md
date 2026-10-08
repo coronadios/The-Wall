@@ -1,3 +1,6 @@
+<p align="center">
+  <img src="assets/banner.svg" alt="The Wall">
+</p>
 # The Wall
 
 > A collaborative pixel canvas built by everyone.

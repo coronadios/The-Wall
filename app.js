@@ -166,15 +166,19 @@ async function start() {
 
                 catch (error) {
 
-                    console.error(
-                        error
-                    );
+    console.error(
+        "THE WALL PIXEL WRITE ERROR:",
+        error
+    );
 
-                    alert(
-                        "Could not place pixels."
-                    );
+    alert(
+        `Could not place pixels.\n\n${
+            error?.message ||
+            "Unknown Supabase error."
+        }`
+    );
 
-                }
+}
 
             };
 

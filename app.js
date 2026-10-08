@@ -320,19 +320,25 @@ async function start() {
 
     }
 
-    catch (error) {
+   catch (error) {
+    console.error("THE WALL STARTUP ERROR:", error);
 
-        console.error(
-            error
-        );
+    const message =
+        error?.message ||
+        error?.error_description ||
+        "Unknown error";
 
+    const code =
+        error?.code ||
+        error?.status ||
+        "";
 
-        loading.innerHTML = `
-            <strong>Unable to enter The Wall.</strong>
-            <span>Check your Supabase configuration.</span>
-        `;
-
-    }
+    loading.innerHTML = `
+        <strong>Unable to enter The Wall.</strong>
+        <span>${message}</span>
+        ${code ? `<small>${code}</small>` : ""}
+    `;
+}
 
 }
 

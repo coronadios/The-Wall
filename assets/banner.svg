@@ -1,0 +1,46 @@
+<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="1600"
+    height="320"
+    viewBox="0 0 1600 320"
+>
+    <rect
+        width="1600"
+        height="320"
+        fill="#050505"
+    />
+
+    <!-- Logo -->
+    <g transform="translate(620 125)">
+        <rect
+            x="0"
+            y="0"
+            width="70"
+            height="70"
+            fill="none"
+            stroke="#FFFFFF"
+            stroke-width="4"
+        />
+
+        <rect
+            x="21"
+            y="21"
+            width="28"
+            height="28"
+            fill="#FFFFFF"
+        />
+    </g>
+
+    <!-- Title -->
+    <text
+        x="720"
+        y="176"
+        font-family="Inter, Arial, sans-serif"
+        font-size="58"
+        font-weight="600"
+        letter-spacing="-2"
+        fill="#FFFFFF"
+    >
+        The Wall
+    </text>
+</svg>

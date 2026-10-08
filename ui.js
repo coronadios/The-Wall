@@ -60,118 +60,167 @@ function buildPalette(
         "";
 
 
-    /*
-     * Brush control
-     */
+/*
+ * Brush control
+ */
 
-    const brushButton =
-        document.createElement(
-            "button"
+const brushControl =
+    document.createElement(
+        "div"
+    );
+
+brushControl.className =
+    "brush-control";
+
+brushControl.setAttribute(
+    "role",
+    "group"
+);
+
+brushControl.setAttribute(
+    "aria-label",
+    "Tamaño del pincel"
+);
+
+
+const brushMinus =
+    document.createElement(
+        "button"
+    );
+
+brushMinus.className =
+    "brush-minus";
+
+brushMinus.type =
+    "button";
+
+brushMinus.textContent =
+    "−";
+
+brushMinus.setAttribute(
+    "aria-label",
+    "Reducir tamaño del pincel"
+);
+
+
+const brushSize =
+    document.createElement(
+        "span"
+    );
+
+brushSize.className =
+    "brush-size";
+
+brushSize.textContent =
+    `${wall.brushSize}×${wall.brushSize}`;
+
+
+const brushPlus =
+    document.createElement(
+        "button"
+    );
+
+brushPlus.className =
+    "brush-plus";
+
+brushPlus.type =
+    "button";
+
+brushPlus.textContent =
+    "+";
+
+brushPlus.setAttribute(
+    "aria-label",
+    "Aumentar tamaño del pincel"
+);
+
+
+const updateBrushLabel =
+    () => {
+
+        brushSize.textContent =
+            `${wall.brushSize}×${wall.brushSize}`;
+
+    };
+
+
+const changeBrushSize =
+    direction => {
+
+        const sizes =
+            wall.brushSizes;
+
+        let index =
+            sizes.indexOf(
+                wall.brushSize
+            );
+
+        index +=
+            direction;
+
+        index =
+            Math.max(
+                0,
+                Math.min(
+                    sizes.length - 1,
+                    index
+                )
+            );
+
+        wall.brushSize =
+            sizes[index];
+
+        updateBrushLabel();
+
+        wall.render();
+
+    };
+
+
+brushMinus.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        changeBrushSize(
+            -1
         );
 
-
-    brushButton.className =
-        "palette-color brush-control";
-
-
-    brushButton.innerHTML = `
-        <span class="brush-minus">−</span>
-        <span class="brush-size">1×1</span>
-        <span class="brush-plus">+</span>
-    `;
+    }
+);
 
 
-    brushButton.title =
-        "Tamaño del pincel";
+brushPlus.addEventListener(
+    "click",
+    event => {
+
+        event.stopPropagation();
+
+        changeBrushSize(
+            1
+        );
+
+    }
+);
 
 
-    brushButton.setAttribute(
-        "aria-label",
-        "Tamaño del pincel"
-    );
+brushControl.appendChild(
+    brushMinus
+);
+
+brushControl.appendChild(
+    brushSize
+);
+
+brushControl.appendChild(
+    brushPlus
+);
 
 
-    const updateBrushLabel =
-        () => {
-
-            brushButton
-                .querySelector(
-                    ".brush-size"
-                )
-                .textContent =
-                    `${wall.brushSize}×${wall.brushSize}`;
-
-        };
-
-
-    brushButton.addEventListener(
-        "click",
-        event => {
-
-            const sizes =
-                wall.brushSizes;
-
-
-            let index =
-                sizes.indexOf(
-                    wall.brushSize
-                );
-
-
-            if (
-                event.target.classList.contains(
-                    "brush-minus"
-                )
-            ) {
-
-                index--;
-
-            }
-
-            else if (
-                event.target.classList.contains(
-                    "brush-plus"
-                )
-            ) {
-
-                index++;
-
-            }
-
-            else {
-
-                index++;
-
-            }
-
-
-            index =
-                Math.max(
-                    0,
-                    Math.min(
-                        sizes.length - 1,
-                        index
-                    )
-                );
-
-
-            wall.brushSize =
-                sizes[index];
-
-
-            updateBrushLabel();
-
-
-            wall.render();
-
-        }
-    );
-
-
-    paletteElement.appendChild(
-        brushButton
-    );
-
+paletteElement.appendChild(
+    brushControl
+);
 
     /*
      * Colors
